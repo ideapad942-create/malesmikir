@@ -3,171 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MALES MIKIR | Path Extractor</title>
+    <title>SYSTEM ACCESS | MALES MIKIR</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        /* --- FONT DIGITAL --- */
+        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
         :root {
-            --primary: #00ff41; /* Warna Hacker Hijau */
-            --bg: #050505;
-            --panel: #111;
-            --border: #333;
+            --hacker-green: #0f0;
+            --dark-bg: #000;
+            --panel-bg: rgba(0, 20, 0, 0.85);
+            --border: #004400;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'VT323', monospace; user-select: none; }
 
         body {
-            background-color: var(--bg);
-            background-image: linear-gradient(rgba(0, 10, 0, 0.9), rgba(0, 0, 0, 0.95));
-            color: #fff;
+            background-color: var(--dark-bg);
+            color: var(--hacker-green);
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
 
-        /* --- HALAMAN DEPAN (MENU) --- */
+        /* --- MATRIX BACKGROUND --- */
+        canvas#matrix {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -1; /* Di belakang konten */
+        }
+
+        /* --- CRT SCANLINE EFFECT (LAYAR MONITOR TUA) --- */
+        .scanlines {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0,0,0,0.2) 50%,
+                rgba(0,0,0,0.2)
+            );
+            background-size: 100% 4px;
+            pointer-events: none; /* Klik tembus */
+            z-index: 999;
+        }
+
+        /* --- DASHBOARD UTAMA --- */
         #dashboard-view {
             height: 100%; overflow-y: auto;
             display: flex; flex-direction: column; align-items: center; padding: 2rem;
+            position: relative; z-index: 10;
         }
 
-        .hacker-header { text-align: center; margin-bottom: 3rem; }
-        .hacker-icon { font-size: 4rem; color: var(--primary); animation: pulse 2s infinite; margin-bottom: 1rem; }
+        /* GLITCH HEADER */
+        .glitch-wrapper { text-align: center; margin-bottom: 3rem; }
         
-        h1 { font-size: 2.5rem; text-transform: uppercase; letter-spacing: 5px; text-shadow: 2px 2px 0px #000; }
-        
+        h1.glitch {
+            font-size: 4rem; font-weight: bold; text-transform: uppercase;
+            position: relative; text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff;
+            animation: glitch 725ms infinite;
+        }
+
+        h1.glitch span { position: absolute; top: 0; left: 0; }
+
+        .system-status {
+            border: 1px solid var(--hacker-green); padding: 5px 20px;
+            font-size: 1.2rem; background: rgba(0,0,0,0.7);
+            box-shadow: 0 0 10px var(--hacker-green);
+            margin-top: 10px; display: inline-block;
+        }
+
+        /* GRID MENU */
         .grid-menu {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem; width: 100%; max-width: 900px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem; width: 100%; max-width: 1000px;
         }
 
         .menu-card {
-            background: #111; border: 1px solid #333; padding: 2rem; border-radius: 8px;
-            cursor: pointer; transition: 0.3s; position: relative; overflow: hidden;
+            background: var(--panel-bg); border: 2px solid var(--border);
+            padding: 2rem; cursor: pointer; transition: 0.3s;
+            position: relative; overflow: hidden;
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
         }
-        .menu-card:hover { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 255, 65, 0.2); transform: translateY(-5px); }
-        .menu-card h3 { margin: 15px 0 5px; color: #fff; }
-        .menu-card p { color: #888; font-size: 0.8rem; }
 
-        /* --- VIEWER (TEMPAT TOOLS DIBUKA) --- */
+        .menu-card:hover {
+            border-color: var(--hacker-green);
+            box-shadow: 0 0 25px var(--hacker-green);
+            transform: scale(1.02);
+            background: #001100;
+        }
+
+        .menu-card h3 { font-size: 2rem; margin: 10px 0; color: #fff; }
+        .menu-card p { font-size: 1.2rem; color: #00cc00; }
+
+        /* --- VIEWER --- */
         #app-viewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 9999; display: none; flex-direction: column;
+            background: #000; z-index: 100; display: none; flex-direction: column;
         }
 
         .top-bar {
-            height: 50px; background: #0a0a0a; border-bottom: 1px solid var(--primary);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem;
+            height: 60px; background: #050505; border-bottom: 2px solid var(--hacker-green);
+            display: flex; align-items: center; justify-content: space-between; padding: 0 2rem;
         }
 
         .btn-back {
-            background: #222; border: 1px solid #444; color: var(--primary);
-            padding: 5px 15px; cursor: pointer; display: flex; align-items: center; gap: 8px;
+            background: #000; border: 1px solid var(--hacker-green);
+            color: var(--hacker-green); padding: 8px 20px; font-size: 1.2rem;
+            cursor: pointer; display: flex; align-items: center; gap: 10px;
+            transition: 0.3s;
         }
-        .btn-back:hover { background: var(--primary); color: #000; }
+        .btn-back:hover { background: var(--hacker-green); color: #000; box-shadow: 0 0 15px var(--hacker-green); }
 
-        iframe { flex: 1; width: 100%; border: none; background: #fff; }
+        iframe { flex: 1; border: none; background: #fff; filter: contrast(1.1); }
 
-        /* --- TEXT EXTRACTOR UI (BARU) --- */
+        /* --- TOOL REMOVE PATH UI --- */
         #local-tool {
-            flex: 1; display: none; flex-direction: column;
-            align-items: center; padding: 2rem; gap: 1rem;
-            background: #0d0d0d;
+            flex: 1; display: none; padding: 2rem;
+            background: rgba(0, 10, 0, 0.95);
         }
 
-        .tool-container {
-            display: flex; gap: 20px; width: 100%; max-width: 1000px; height: 100%;
+        .terminal-layout {
+            display: flex; gap: 2rem; height: 100%; max-width: 1200px; margin: 0 auto;
         }
 
-        .input-group { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-        
-        label { color: var(--primary); font-weight: bold; letter-spacing: 1px; }
+        .panel {
+            flex: 1; display: flex; flex-direction: column;
+            border: 1px solid #333; padding: 10px; background: #000;
+        }
+
+        .panel-header {
+            background: #003300; color: #fff; padding: 5px 10px; font-size: 1.2rem; margin-bottom: 10px;
+        }
 
         textarea {
-            flex: 1; background: #000; border: 1px solid #333; color: #0f0;
-            padding: 15px; font-size: 0.9rem; resize: none; outline: none;
-            user-select: text; /* Agar bisa dicopy paste */
+            flex: 1; background: #000; border: none; color: var(--hacker-green);
+            font-size: 1.1rem; padding: 10px; resize: none; outline: none;
+            font-family: 'Courier New', monospace; user-select: text;
         }
-        textarea:focus { border-color: var(--primary); }
-
-        .btn-action {
-            background: var(--primary); color: #000; border: none;
-            padding: 15px; font-weight: bold; cursor: pointer; font-size: 1.1rem;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            margin-top: 10px;
-        }
-        .btn-action:active { transform: scale(0.98); }
-
-        .middle-controls {
+        
+        .controls {
             display: flex; flex-direction: column; justify-content: center; gap: 1rem;
         }
 
-        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; text-shadow: 0 0 20px var(--primary); } 100% { opacity: 0.8; } }
+        .btn-action {
+            background: #000; border: 2px solid var(--hacker-green); color: var(--hacker-green);
+            padding: 15px; cursor: pointer; font-size: 1.5rem; transition: 0.2s;
+        }
+        .btn-action:hover { background: var(--hacker-green); color: #000; }
+        .btn-action:active { transform: scale(0.95); }
+
+        /* ANIMATIONS */
+        @keyframes glitch {
+            0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff; }
+            15% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff; }
+            16% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff; }
+            49% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff; }
+            50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff; }
+            99% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff; }
+            100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff; }
+        }
+
     </style>
 </head>
 <body oncontextmenu="return false;">
 
+    <canvas id="matrix"></canvas>
+    
+    <div class="scanlines"></div>
+
     <div id="dashboard-view">
-        <div class="hacker-header">
-            <div class="hacker-icon"><i data-lucide="venetian-mask"></i></div>
-            <h1>MALES MIKIR</h1>
-            <p style="color: #666;">System Integrity: Verified</p>
+        <div class="glitch-wrapper">
+            <h1 class="glitch">MALES MIKIR_V3.0</h1>
+            <div class="system-status">● SYSTEM CONNECTED: @BANGJEYY</div>
         </div>
 
         <div class="grid-menu">
-            <div class="menu-card" onclick="openApp('web', 'https://robot-rho-dusky.vercel.app/', 'VISUAL_ID.exe')">
-                <i data-lucide="scan-face" color="#00ff41" size="32"></i>
-                <h3>Identifikasi Gambar</h3>
-                <p>Membuka Tools Visual Analisis.</p>
+            <div class="menu-card" onclick="openApp('web', 'https://robot-rho-dusky.vercel.app/', 'VISUAL_IDENTIFICATION')">
+                <i data-lucide="scan-face" size="40"></i>
+                <h3>[1] IDENTIFIKASI GAMBAR</h3>
+                <p>> Execute Visual AI Protocol...</p>
             </div>
 
-            <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO_INJECT.exe')">
-                <i data-lucide="binary" color="#00ff41" size="32"></i>
-                <h3>SEO Generator</h3>
-                <p>Membuka Generator Keyword.</p>
+            <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO_INJECTION')">
+                <i data-lucide="binary" size="40"></i>
+                <h3>[2] SEO GENERATOR</h3>
+                <p>> Inject Meta Keywords...</p>
             </div>
 
-            <div class="menu-card" onclick="openApp('local', '', 'PATH_EXTRACTOR.sh')">
-                <i data-lucide="scissors" color="#ff003c" size="32"></i>
-                <h3 style="color: #ff003c;">Remove File Path</h3>
-                <p>Ambil Nama File dari Path Panjang.</p>
+            <div class="menu-card" onclick="openApp('local', '', 'PATH_EXTRACTOR')">
+                <i data-lucide="file-code" size="40" color="#ff0055"></i>
+                <h3 style="color:#ff0055;">[3] REMOVE PATH NAME</h3>
+                <p>> Extract Filename from String...</p>
             </div>
         </div>
-        
-        <footer style="margin-top: auto; padding: 2rem; color: #444; font-size: 0.7rem;">
-            @Bangjeyy Tools // Encrypted
-        </footer>
     </div>
 
     <div id="app-viewer">
         <div class="top-bar">
             <button class="btn-back" onclick="closeApp()">
-                <i data-lucide="corner-up-left" size="14"></i> MENU UTAMA
+                <i data-lucide="power"></i> TERMINATE / BACK
             </button>
-            <div style="color:white; font-weight:bold;" id="app-title">TITLE</div>
+            <div style="font-size:1.5rem; letter-spacing:2px;" id="app-title">TITLE</div>
             <div style="width:100px;"></div>
         </div>
 
         <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
 
         <div id="local-tool">
-            <div class="tool-container">
-                <div class="input-group">
-                    <label>> PASTE PATH (INPUT)</label>
-                    <textarea id="inputText" placeholder='"C:\Users\...\Foto.png"'></textarea>
+            <div class="terminal-layout">
+                <div class="panel">
+                    <div class="panel-header">>> INPUT_SOURCE (PASTE PATHS HERE)</div>
+                    <textarea id="inputText" placeholder='Example: "C:\Users\Admin\Downloads\Secret.mp4"...'></textarea>
                 </div>
 
-                <div class="middle-controls">
+                <div class="controls">
                     <button class="btn-action" onclick="processPath()">
-                        <i data-lucide="arrow-right"></i>
+                        PROCESS >
                     </button>
-                    <button class="btn-action" style="background:#333; color:white;" onclick="clearAll()">
-                        <i data-lucide="trash-2"></i>
+                    <button class="btn-action" style="border-color:#ff0055; color:#ff0055;" onclick="clearAll()">
+                        CLEAR X
                     </button>
                 </div>
 
-                <div class="input-group">
-                    <label>> HASIL NAMA FILE (OUTPUT)</label>
-                    <textarea id="outputText" readonly placeholder="Hasil akan muncul di sini..."></textarea>
-                    <button class="btn-action" onclick="copyResult()">COPY HASIL</button>
+                <div class="panel">
+                    <div class="panel-header">>> OUTPUT_RESULT (CLEAN NAMES)</div>
+                    <textarea id="outputText" readonly></textarea>
+                    <button class="btn-back" style="margin-top:10px; justify-content:center;" onclick="copyResult()">
+                        [ COPY DATA ]
+                    </button>
                 </div>
             </div>
         </div>
@@ -176,13 +240,48 @@
     <script>
         lucide.createIcons();
 
+        /* --- MATRIX RAIN EFFECT SCRIPT --- */
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; // Efek trail bayangan
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#0F0"; // Warna teks hijau
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        setInterval(drawMatrix, 33); // Kecepatan animasi
+
+        /* --- LOGIKA APLIKASI --- */
         const dashboard = document.getElementById('dashboard-view');
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
         const titleLabel = document.getElementById('app-title');
 
-        // Navigasi
         function openApp(type, url, title) {
             dashboard.style.display = 'none';
             viewer.style.display = 'flex';
@@ -195,6 +294,8 @@
             } else {
                 iframe.style.display = 'none';
                 localTool.style.display = 'flex';
+                // Efek mengetik otomatis saat buka tool path
+                document.getElementById('inputText').placeholder = "Initializing...\nWaiting for input stream...";
             }
         }
 
@@ -204,48 +305,44 @@
             iframe.src = "";
         }
 
-        // --- LOGIKA REMOVE PATH (TEXT PROCESSING) ---
+        // --- FUNGSI EXTRACT PATH (SESUAI PERMINTAAN) ---
         function processPath() {
-            // 1. Ambil teks dari kotak kiri
             const rawText = document.getElementById('inputText').value;
-            
-            // 2. Pecah per baris (Enter)
             const lines = rawText.split('\n');
             let result = "";
 
             lines.forEach(line => {
                 let cleanLine = line.trim();
-                
-                // Jika baris tidak kosong
                 if (cleanLine) {
-                    // Hapus tanda kutip " jika ada
+                    // Hapus tanda kutip "
                     cleanLine = cleanLine.replace(/"/g, '');
-
-                    // Pecah berdasarkan tanda backslash (\)
-                    // Kita ambil bagian paling terakhir (nama file)
+                    // Ambil nama file paling belakang setelah \
                     const parts = cleanLine.split('\\');
                     const fileName = parts[parts.length - 1];
-
-                    // Tambahkan ke hasil
                     result += fileName + "\n";
                 }
             });
 
-            // 3. Masukkan ke kotak kanan
             document.getElementById('outputText').value = result;
         }
 
         function copyResult() {
             const copyText = document.getElementById("outputText");
             copyText.select();
-            document.execCommand("copy"); // Cara klasik tapi kompatibel
-            alert("Nama file berhasil disalin!");
+            document.execCommand("copy");
+            alert(">> DATA COPIED TO CLIPBOARD");
         }
 
         function clearAll() {
             document.getElementById('inputText').value = "";
             document.getElementById('outputText').value = "";
         }
+        
+        // Resize canvas saat window berubah
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
     </script>
 </body>
 </html>
