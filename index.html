@@ -3,157 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYSTEM ACCESS | MALES MIKIR</title>
+    <title>MALES MIKIR V3.0</title>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
-        /* --- FONT DIGITAL --- */
-        @import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
-
         :root {
+            /* --- WARNA MODE HACKER --- */
             --hacker-green: #0f0;
-            --dark-bg: #000;
-            --panel-bg: rgba(0, 20, 0, 0.85);
-            --border: #004400;
+            --hacker-bg: #000;
+            --hacker-panel: rgba(0, 20, 0, 0.85);
+            
+            /* --- WARNA MODE PROFESIONAL --- */
+            --pro-bg: #0f172a;      /* Latar belakang biru gelap elegan */
+            --pro-panel: #1e293b;   /* Warna panel yang lebih terang */
+            --pro-text: #f1f5f9;    /* Teks putih terang */
+            --pro-accent: #6366f1;  /* Aksen ungu modern */
+            --pro-border: #334155;  /* Border halus */
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'VT323', monospace; user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        /* --- DEFAULT STYLE (PROFESIONAL MODE) --- */
         body {
-            background-color: var(--dark-bg);
-            color: var(--hacker-green);
+            background-color: var(--pro-bg);
+            color: var(--pro-text);
+            font-family: 'Inter', sans-serif; /* Font modern yang bersih */
             height: 100vh;
             overflow: hidden;
-            position: relative;
+            transition: background-color 0.5s ease;
         }
 
-        /* --- MATRIX BACKGROUND --- */
-        canvas#matrix {
-            position: fixed; top: 0; left: 0;
-            width: 100%; height: 100%;
-            z-index: -1; /* Di belakang konten */
+        /* --- HACKER MODE STYLES (Hanya aktif jika body punya class 'hacker-mode') --- */
+        body.hacker-mode {
+            background-color: var(--hacker-bg);
+            color: var(--hacker-green);
+            font-family: 'VT323', monospace; /* Font hacker jadul */
         }
 
-        /* --- CRT SCANLINE EFFECT (LAYAR MONITOR TUA) --- */
+        body.hacker-mode .pro-element { display: none !important; } /* Sembunyikan elemen pro di mode hacker */
+        body:not(.hacker-mode) .hacker-element { display: none !important; } /* Sembunyikan elemen hacker di mode pro */
+
+        /* EFEK BACKGROUND HACKER */
+        canvas#matrix { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0; transition: opacity 0.5s; }
+        body.hacker-mode canvas#matrix { opacity: 1; }
+
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0,0,0,0.2) 50%,
-                rgba(0,0,0,0.2)
-            );
-            background-size: 100% 4px;
-            pointer-events: none; /* Klik tembus */
-            z-index: 999;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%);
+            background-size: 100% 4px; pointer-events: none; z-index: 999;
+            opacity: 0; transition: opacity 0.5s;
         }
+        body.hacker-mode .scanlines { opacity: 1; }
 
-        /* --- DASHBOARD UTAMA --- */
+
+        /* --- 1. DASHBOARD VIEW (TAMPILAN AWAL) --- */
         #dashboard-view {
             height: 100%; overflow-y: auto;
-            display: flex; flex-direction: column; align-items: center; padding: 2rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem;
             position: relative; z-index: 10;
         }
 
-        /* GLITCH HEADER */
-        .glitch-wrapper { text-align: center; margin-bottom: 3rem; }
-        
+        /* Header Glitch (Hacker Mode Only) */
+        .glitch-wrapper { text-align: center; margin-bottom: 4rem; }
         h1.glitch {
-            font-size: 4rem; font-weight: bold; text-transform: uppercase;
-            position: relative; text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff;
-            animation: glitch 725ms infinite;
+            font-size: 5rem; font-weight: bold; text-transform: uppercase;
+            text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff;
+            animation: glitch 725ms infinite; letter-spacing: 5px;
         }
-
-        h1.glitch span { position: absolute; top: 0; left: 0; }
-
         .system-status {
-            border: 1px solid var(--hacker-green); padding: 5px 20px;
-            font-size: 1.2rem; background: rgba(0,0,0,0.7);
-            box-shadow: 0 0 10px var(--hacker-green);
-            margin-top: 10px; display: inline-block;
+            border: 1px solid var(--hacker-green); padding: 8px 25px;
+            font-size: 1.3rem; background: rgba(0,0,0,0.7);
+            box-shadow: 0 0 15px var(--hacker-green); margin-top: 15px; display: inline-block;
         }
 
-        /* GRID MENU */
+        /* Menu Grid */
         .grid-menu {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem; width: 100%; max-width: 1000px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem; width: 100%; max-width: 1200px;
         }
 
         .menu-card {
-            background: var(--panel-bg); border: 2px solid var(--border);
-            padding: 2rem; cursor: pointer; transition: 0.3s;
-            position: relative; overflow: hidden;
-            box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+            background: var(--hacker-panel); border: 2px solid #004400;
+            padding: 2.5rem; cursor: pointer; transition: 0.3s;
+            position: relative; overflow: hidden; text-align: left;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
         }
-
         .menu-card:hover {
-            border-color: var(--hacker-green);
-            box-shadow: 0 0 25px var(--hacker-green);
-            transform: scale(1.02);
-            background: #001100;
+            border-color: var(--hacker-green); box-shadow: 0 0 30px var(--hacker-green);
+            transform: translateY(-5px); background: #001100;
         }
-
-        .menu-card h3 { font-size: 2rem; margin: 10px 0; color: #fff; }
+        .menu-card h3 { font-size: 2.2rem; margin: 15px 0; color: #fff; }
         .menu-card p { font-size: 1.2rem; color: #00cc00; }
+        .card-num { font-size: 3rem; opacity: 0.3; position: absolute; top: 10px; right: 20px; font-weight: bold; }
 
-        /* --- VIEWER --- */
+
+        /* --- 2. APP VIEWER (TAMPILAN DALAM TOOLS - BERSIH & RAPI) --- */
         #app-viewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 100; display: none; flex-direction: column;
+            background: var(--pro-bg); z-index: 100; display: none; flex-direction: column;
         }
 
+        /* Top Navigation Bar Modern */
         .top-bar {
-            height: 60px; background: #050505; border-bottom: 2px solid var(--hacker-green);
+            height: 65px; background: var(--pro-panel);
+            border-bottom: 1px solid var(--pro-border);
             display: flex; align-items: center; justify-content: space-between; padding: 0 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
 
         .btn-back {
-            background: #000; border: 1px solid var(--hacker-green);
-            color: var(--hacker-green); padding: 8px 20px; font-size: 1.2rem;
-            cursor: pointer; display: flex; align-items: center; gap: 10px;
-            transition: 0.3s;
+            background: transparent; border: 1px solid var(--pro-border);
+            color: var(--pro-text); padding: 8px 16px; font-size: 0.95rem;
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            transition: 0.2s; border-radius: 8px; font-weight: 600; font-family: 'Inter', sans-serif;
         }
-        .btn-back:hover { background: var(--hacker-green); color: #000; box-shadow: 0 0 15px var(--hacker-green); }
+        .btn-back:hover { background: var(--pro-border); }
+        .btn-back i { color: var(--pro-accent); }
 
-        iframe { flex: 1; border: none; background: #fff; filter: contrast(1.1); }
+        #app-title { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; }
 
-        /* --- TOOL REMOVE PATH UI --- */
+        /* Iframe (Website Luar) */
+        iframe { flex: 1; border: none; background: #fff; }
+
+
+        /* --- 3. TOOL LOCAL UI (Path Remove - Tampilan Bersih) --- */
         #local-tool {
-            flex: 1; display: none; padding: 2rem;
-            background: rgba(0, 10, 0, 0.95);
+            flex: 1; display: none; padding: 3rem;
+            background: var(--pro-bg);
+            align-items: flex-start; justify-content: center;
         }
 
-        .terminal-layout {
-            display: flex; gap: 2rem; height: 100%; max-width: 1200px; margin: 0 auto;
+        .tool-layout {
+            display: flex; gap: 2rem; height: 100%; width: 100%; max-width: 1200px; margin: 0 auto;
         }
 
-        .panel {
+        .panel-box {
             flex: 1; display: flex; flex-direction: column;
-            border: 1px solid #333; padding: 10px; background: #000;
+            background: var(--pro-panel); border-radius: 12px;
+            border: 1px solid var(--pro-border); overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
 
         .panel-header {
-            background: #003300; color: #fff; padding: 5px 10px; font-size: 1.2rem; margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 15px 20px; font-weight: 600; font-size: 1rem;
+            border-bottom: 1px solid var(--pro-border);
+            display: flex; align-items: center; gap: 10px;
         }
+        .panel-header i { color: var(--pro-accent); }
 
         textarea {
-            flex: 1; background: #000; border: none; color: var(--hacker-green);
-            font-size: 1.1rem; padding: 10px; resize: none; outline: none;
-            font-family: 'Courier New', monospace; user-select: text;
+            flex: 1; background: transparent; border: none; color: var(--pro-text);
+            font-size: 0.95rem; padding: 20px; resize: none; outline: none;
+            font-family: 'Inter', sans-serif; line-height: 1.6;
         }
+        textarea::placeholder { color: #64748b; }
         
-        .controls {
+        .controls-middle {
             display: flex; flex-direction: column; justify-content: center; gap: 1rem;
         }
 
-        .btn-action {
-            background: #000; border: 2px solid var(--hacker-green); color: var(--hacker-green);
-            padding: 15px; cursor: pointer; font-size: 1.5rem; transition: 0.2s;
+        .btn-process {
+            background: var(--pro-accent); color: white; border: none;
+            width: 50px; height: 50px; border-radius: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.25);
         }
-        .btn-action:hover { background: var(--hacker-green); color: #000; }
-        .btn-action:active { transform: scale(0.95); }
+        .btn-process:hover { transform: scale(1.05); background: #4f46e5; }
 
-        /* ANIMATIONS */
+        .btn-copy {
+            background: transparent; border: 1px solid var(--pro-border);
+            color: var(--pro-text); padding: 12px; text-align: center;
+            cursor: pointer; transition: 0.2s; font-weight: 600;
+            border-top: 1px solid var(--pro-border);
+            font-family: 'Inter', sans-serif;
+        }
+        .btn-copy:hover { background: rgba(255, 255, 255, 0.05); color: var(--pro-accent); }
+
+        /* ANIMASI GLITCH (Hanya jalan di mode hacker) */
         @keyframes glitch {
             0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff; }
             15% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff; }
@@ -163,74 +191,79 @@
             99% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff; }
             100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff; }
         }
-
     </style>
 </head>
-<body oncontextmenu="return false;">
+<body class="hacker-mode" oncontextmenu="return false;">
 
-    <canvas id="matrix"></canvas>
-    
-    <div class="scanlines"></div>
+    <canvas id="matrix" class="hacker-element"></canvas>
+    <div class="scanlines hacker-element"></div>
 
     <div id="dashboard-view">
-        <div class="glitch-wrapper">
+        <div class="glitch-wrapper hacker-element">
             <h1 class="glitch">MALES MIKIR_V3.0</h1>
             <div class="system-status">● SYSTEM CONNECTED: @BANGJEYY</div>
         </div>
 
         <div class="grid-menu">
-            <div class="menu-card" onclick="openApp('web', 'https://robot-rho-dusky.vercel.app/', 'VISUAL_IDENTIFICATION')">
-                <i data-lucide="scan-face" size="40"></i>
-                <h3>[1] IDENTIFIKASI GAMBAR</h3>
+            <div class="menu-card" onclick="openApp('web', 'https://robot-rho-dusky.vercel.app/', 'Identifikasi Gambar')">
+                <div class="card-num">01</div>
+                <i data-lucide="scan-face" size="45" color="#0f0"></i>
+                <h3>IDENTIFIKASI GAMBAR</h3>
                 <p>> Execute Visual AI Protocol...</p>
             </div>
 
-            <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO_INJECTION')">
-                <i data-lucide="binary" size="40"></i>
-                <h3>[2] SEO GENERATOR</h3>
+            <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO Generator')">
+                <div class="card-num">02</div>
+                <i data-lucide="binary" size="45" color="#0f0"></i>
+                <h3>SEO GENERATOR</h3>
                 <p>> Inject Meta Keywords...</p>
             </div>
 
-            <div class="menu-card" onclick="openApp('local', '', 'PATH_EXTRACTOR')">
-                <i data-lucide="file-code" size="40" color="#ff0055"></i>
-                <h3 style="color:#ff0055;">[3] REMOVE PATH NAME</h3>
+            <div class="menu-card" onclick="openApp('local', '', 'Remove Path Name')">
+                <div class="card-num">03</div>
+                <i data-lucide="file-code" size="45" color="#ff0055"></i>
+                <h3 style="color:#ff0055;">REMOVE PATH NAME</h3>
                 <p>> Extract Filename from String...</p>
             </div>
         </div>
     </div>
 
     <div id="app-viewer">
-        <div class="top-bar">
+        <div class="top-bar pro-element">
             <button class="btn-back" onclick="closeApp()">
-                <i data-lucide="power"></i> TERMINATE / BACK
+                <i data-lucide="arrow-left"></i> Kembali ke Menu
             </button>
-            <div style="font-size:1.5rem; letter-spacing:2px;" id="app-title">TITLE</div>
-            <div style="width:100px;"></div>
-        </div>
+            <div id="app-title">Nama Tools</div>
+            <div style="width: 100px;"></div> </div>
 
-        <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+        <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
 
-        <div id="local-tool">
-            <div class="terminal-layout">
-                <div class="panel">
-                    <div class="panel-header">>> INPUT_SOURCE (PASTE PATHS HERE)</div>
-                    <textarea id="inputText" placeholder='Example: "C:\Users\Admin\Downloads\Secret.mp4"...'></textarea>
+        <div id="local-tool" class="pro-element">
+            <div class="tool-layout">
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <i data-lucide="log-in"></i> Input Path (Paste di sini)
+                    </div>
+                    <textarea id="inputText" placeholder='Contoh: "C:\Users\Data\VideoLiburan.mp4"
+Paste daftar path panjang Anda di sini...'></textarea>
                 </div>
 
-                <div class="controls">
-                    <button class="btn-action" onclick="processPath()">
-                        PROCESS >
+                <div class="controls-middle">
+                    <button class="btn-process" onclick="processPath()" title="Proses Path">
+                        <i data-lucide="arrow-right" size="24"></i>
                     </button>
-                    <button class="btn-action" style="border-color:#ff0055; color:#ff0055;" onclick="clearAll()">
-                        CLEAR X
+                    <button class="btn-process" onclick="clearAll()" title="Hapus Semua" style="background: #ef4444;">
+                        <i data-lucide="trash-2" size="24"></i>
                     </button>
                 </div>
 
-                <div class="panel">
-                    <div class="panel-header">>> OUTPUT_RESULT (CLEAN NAMES)</div>
-                    <textarea id="outputText" readonly></textarea>
-                    <button class="btn-back" style="margin-top:10px; justify-content:center;" onclick="copyResult()">
-                        [ COPY DATA ]
+                <div class="panel-box">
+                    <div class="panel-header">
+                        <i data-lucide="log-out"></i> Output (Nama File Bersih)
+                    </div>
+                    <textarea id="outputText" readonly placeholder="Hasil nama file akan muncul di sini..."></textarea>
+                    <button class="btn-copy" onclick="copyResult()">
+                        <i data-lucide="copy" style="display: inline; margin-right:5px;"></i> Salin Hasil
                     </button>
                 </div>
             </div>
@@ -240,53 +273,64 @@
     <script>
         lucide.createIcons();
 
-        /* --- MATRIX RAIN EFFECT SCRIPT --- */
+        /* --- SCRIPT EFEK MATRIX RAIN --- */
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
+        let matrixInterval;
 
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        function startMatrix() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
 
-        const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%";
-        const fontSize = 16;
-        const columns = canvas.width / fontSize;
-
-        const drops = [];
-        for (let x = 0; x < columns; x++) {
-            drops[x] = 1;
-        }
-
-        function drawMatrix() {
-            ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; // Efek trail bayangan
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.fillStyle = "#0F0"; // Warna teks hijau
-            ctx.font = fontSize + "px monospace";
-
-            for (let i = 0; i < drops.length; i++) {
-                const text = letters.charAt(Math.floor(Math.random() * letters.length));
-                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#0F0";
+                ctx.font = fontSize + "px monospace";
+                for (let i = 0; i < drops.length; i++) {
+                    const text = letters.charAt(Math.floor(Math.random() * letters.length));
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
                 }
-                drops[i]++;
             }
+            matrixInterval = setInterval(draw, 33);
         }
-        setInterval(drawMatrix, 33); // Kecepatan animasi
 
-        /* --- LOGIKA APLIKASI --- */
+        function stopMatrix() {
+            clearInterval(matrixInterval);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Jalankan matrix saat awal load
+        startMatrix();
+        window.addEventListener('resize', () => { if(document.body.classList.contains('hacker-mode')) { stopMatrix(); startMatrix(); }});
+
+
+        /* --- LOGIKA NAVIGASI & GANTI MODE TAMPILAN --- */
         const dashboard = document.getElementById('dashboard-view');
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
         const titleLabel = document.getElementById('app-title');
 
+        // BUKA TOOL (Pindah ke Mode Profesional)
         function openApp(type, url, title) {
+            // 1. Matikan Efek Hacker
+            document.body.classList.remove('hacker-mode');
+            stopMatrix();
+            
+            // 2. Tampilkan Viewer
             dashboard.style.display = 'none';
             viewer.style.display = 'flex';
             titleLabel.innerText = title;
+            lucide.createIcons(); // Refresh icon di top bar
 
+            // 3. Pilih Konten
             if (type === 'web') {
                 iframe.style.display = 'block';
                 localTool.style.display = 'none';
@@ -294,55 +338,50 @@
             } else {
                 iframe.style.display = 'none';
                 localTool.style.display = 'flex';
-                // Efek mengetik otomatis saat buka tool path
-                document.getElementById('inputText').placeholder = "Initializing...\nWaiting for input stream...";
+                document.getElementById('inputText').focus();
             }
         }
 
+        // KEMBALI KE MENU (Pindah ke Mode Hacker)
         function closeApp() {
+            // 1. Nyalakan Efek Hacker
+            document.body.classList.add('hacker-mode');
+            startMatrix();
+
+            // 2. Tampilkan Dashboard
             viewer.style.display = 'none';
             dashboard.style.display = 'flex';
-            iframe.src = "";
+            iframe.src = ""; // Reset iframe
+            clearAll(); // Reset tool lokal
         }
 
-        // --- FUNGSI EXTRACT PATH (SESUAI PERMINTAAN) ---
+        /* --- FUNGSI TOOL REMOVE PATH --- */
         function processPath() {
             const rawText = document.getElementById('inputText').value;
             const lines = rawText.split('\n');
             let result = "";
-
             lines.forEach(line => {
-                let cleanLine = line.trim();
+                let cleanLine = line.trim().replace(/"/g, '');
                 if (cleanLine) {
-                    // Hapus tanda kutip "
-                    cleanLine = cleanLine.replace(/"/g, '');
-                    // Ambil nama file paling belakang setelah \
                     const parts = cleanLine.split('\\');
-                    const fileName = parts[parts.length - 1];
-                    result += fileName + "\n";
+                    result += parts[parts.length - 1] + "\n";
                 }
             });
-
             document.getElementById('outputText').value = result;
         }
 
         function copyResult() {
             const copyText = document.getElementById("outputText");
+            if(!copyText.value) return alert("Tidak ada hasil untuk disalin!");
             copyText.select();
             document.execCommand("copy");
-            alert(">> DATA COPIED TO CLIPBOARD");
+            alert("Hasil berhasil disalin ke clipboard!");
         }
 
         function clearAll() {
             document.getElementById('inputText').value = "";
             document.getElementById('outputText').value = "";
         }
-        
-        // Resize canvas saat window berubah
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        });
     </script>
 </body>
 </html>
