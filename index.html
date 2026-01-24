@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MALES MIKIR | Ultimate Dashboard</title>
+    <title>MALES MIKIR | Classified Dashboard</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root {
-            --primary: #6366f1;
-            --bg: #0b0f19;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.1);
+            --primary: #00ff41; /* Hacker Green */
+            --secondary: #6366f1;
+            --bg: #050505;
+            --panel: #0a0a0a;
+            --border: #333;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; user-select: none; }
 
         body {
             background-color: var(--bg);
-            background-image: radial-gradient(circle at top, #1e293b, #0b0f19);
+            background-image: 
+                linear-gradient(rgba(0, 20, 0, 0.9), rgba(0, 10, 0, 0.95)),
+                url("https://media.giphy.com/media/U3qYN8S0j3bpK/giphy.gif"); /* Matrix Background Effect */
+            background-size: cover;
             color: #fff;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* --- HALAMAN UTAMA --- */
+        /* --- DASHBOARD UTAMA --- */
         #dashboard-view {
             height: 100%;
             overflow-y: auto;
@@ -34,19 +38,50 @@
             transition: 0.3s;
         }
 
-        .header-title {
-            text-align: center; margin-bottom: 3rem;
-            animation: fadeIn 1s ease;
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+        /* HACKER HEADER STYLE */
+        .hacker-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            position: relative;
         }
 
+        .hacker-icon {
+            font-size: 4rem;
+            color: var(--primary);
+            text-shadow: 0 0 20px var(--primary);
+            animation: pulse 2s infinite;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 2px 2px 0px #000;
+            position: relative;
+        }
+        
+        /* Efek Glitch pada Teks */
+        h1::before {
+            content: attr(data-text);
+            position: absolute; left: -2px; text-shadow: 1px 0 red; top:0;
+            overflow: hidden; clip: rect(0, 900px, 0, 0); animation: glitch-2 3s infinite linear alternate-reverse;
+        }
+
+        .status-badge {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        /* MENU GRID */
         .grid-menu {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -56,10 +91,10 @@
         }
 
         .menu-card {
-            background: var(--card-bg);
+            background: rgba(20, 20, 20, 0.8);
             border: 1px solid var(--border);
             padding: 2rem;
-            border-radius: 12px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
@@ -67,251 +102,244 @@
         }
 
         .menu-card:hover {
-            background: rgba(255,255,255,0.1);
-            transform: translateY(-5px);
             border-color: var(--primary);
-            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            transform: translateY(-5px);
         }
 
         .menu-card h3 { margin: 15px 0 5px; color: #fff; font-size: 1.2rem; }
-        .menu-card p { color: #94a3b8; font-size: 0.8rem; }
+        .menu-card p { color: #888; font-size: 0.8rem; }
 
-        /* --- LAYAR VIEWER (Saat Tool Dibuka) --- */
+        /* --- VIEWER LAYAR PENUH --- */
         #app-viewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0f172a; z-index: 9999;
-            display: none; /* Default Hidden */
+            background: #000; z-index: 9999;
+            display: none;
             flex-direction: column;
         }
 
         .top-bar {
-            height: 60px;
-            background: #020617;
-            border-bottom: 1px solid var(--border);
+            height: 50px;
+            background: #111;
+            border-bottom: 1px solid var(--primary);
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: space-between; /* Space between untuk memisahkan tombol & judul */
             padding: 0 1.5rem;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.8);
         }
 
-        .btn-nav {
-            background: rgba(255,255,255,0.1);
-            border: none; color: white;
-            padding: 8px 16px; border-radius: 6px;
-            cursor: pointer; display: flex; align-items: center; gap: 8px;
-            font-size: 0.9rem; transition: 0.2s;
+        .btn-back {
+            background: #222;
+            border: 1px solid #444;
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.8rem;
+            transition: 0.2s;
         }
-        .btn-nav:hover { background: var(--primary); }
+        .btn-back:hover { background: var(--primary); color: #000; }
 
-        /* Iframe untuk Web Luar */
+        .app-title-display {
+            color: #fff;
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+
         iframe {
             flex: 1; width: 100%; border: none; background: #fff;
         }
 
-        /* --- TOOL REMOVE PATH (LOKAL) --- */
+        /* --- LOCAL TOOL UI (Remove Path) --- */
         #local-tool {
             flex: 1; display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background: radial-gradient(circle, #1e293b 0%, #0f172a 100%);
+            background: radial-gradient(circle, #1a1a1a 0%, #000 100%);
         }
-
+        
         .upload-box {
-            border: 2px dashed #475569;
-            padding: 3rem; border-radius: 20px;
-            text-align: center; width: 80%; max-width: 500px;
-            transition: 0.3s; background: rgba(0,0,0,0.2);
+            border: 2px dashed #333;
+            background: rgba(255,255,255,0.02);
+            padding: 3rem; width: 80%; max-width: 500px;
+            text-align: center; border-radius: 10px;
+            cursor: pointer; transition: 0.3s;
         }
-        .upload-box:hover { border-color: var(--primary); background: rgba(99, 102, 241, 0.05); }
+        .upload-box:hover { border-color: var(--primary); }
 
-        .btn-action {
-            margin-top: 20px; padding: 12px 30px;
-            background: #f43f5e; border: none; color: white;
-            border-radius: 8px; font-weight: bold; cursor: pointer;
-            display: flex; align-items: center; gap: 10px;
-            font-size: 1rem; box-shadow: 0 5px 15px rgba(244, 63, 94, 0.3);
+        .btn-hack {
+            margin-top: 20px; padding: 12px 40px;
+            background: transparent; border: 1px solid var(--primary);
+            color: var(--primary); font-weight: bold; cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,255,65,0.1);
+            transition: 0.3s;
         }
-        .btn-action:hover { transform: scale(1.05); background: #e11d48; }
+        .btn-hack:hover { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary); }
 
-        .log-terminal {
-            width: 80%; max-width: 500px; height: 150px;
+        /* Log Terminal */
+        .terminal-log {
+            width: 80%; max-width: 600px; height: 150px;
             background: #000; border: 1px solid #333;
-            margin-top: 20px; padding: 15px; border-radius: 8px;
-            font-family: 'Courier New', monospace; font-size: 0.8rem;
-            color: #4ade80; overflow-y: auto; display: none;
+            margin-top: 2rem; padding: 10px;
+            color: var(--primary); font-size: 0.8rem;
+            overflow-y: auto; display: none;
+            text-align: left;
         }
 
-        @keyframes fadeIn { from{opacity:0; transform:translateY(20px);} to{opacity:1; transform:translateY(0);} }
+        /* ANIMATIONS */
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; text-shadow: 0 0 30px var(--primary); } 100% { opacity: 0.8; } }
+        @keyframes glitch-2 { 0% { clip: rect(20px, 9999px, 10px, 0); } 100% { clip: rect(50px, 9999px, 80px, 0); } }
+
     </style>
 </head>
-<body>
-
-    <div id="dashboard-view">
-        <header class="header-title">
-            <h1>MALES MIKIR DASHBOARD</h1>
-            <p>Pusat Kontrol Tools AI & Utilitas</p>
-        </header>
+<body oncontextmenu="return false;"> <div id="dashboard-view">
+        <div class="hacker-header">
+            <div class="hacker-icon">
+                <i data-lucide="venetian-mask"></i>
+            </div>
+            <h1 data-text="MALES MIKIR">MALES MIKIR</h1>
+            <div class="status-badge">● SYSTEM SECURE & ENCRYPTED</div>
+            <p style="color: #666; margin-top: 10px; font-size: 0.8rem;">Access Level: Administrator</p>
+        </div>
 
         <div class="grid-menu">
-            <div class="menu-card" onclick="openApp('web', 'https://robot-rho-dusky.vercel.app/', 'Identifikasi Gambar')">
-                <i data-lucide="scan-eye" color="#818cf8" size="40"></i>
+            <div class="menu-card" onclick="openApp('web', 'https://robot-rho-dusky.vercel.app/', 'VISUAL_IDENTIFICATION.exe')">
+                <i data-lucide="scan-face" color="#00ff41" size="32"></i>
                 <h3>Identifikasi Gambar</h3>
-                <p>Analisis visual AI (Server Rho-Dusky).</p>
+                <p>AI Visual Analysis Protocol.</p>
             </div>
 
-            <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO Generator')">
-                <i data-lucide="zap" color="#eab308" size="40"></i>
+            <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO_INJECTOR.exe')">
+                <i data-lucide="binary" color="#00ff41" size="32"></i>
                 <h3>SEO Generator</h3>
-                <p>Buat Title & Deskripsi Otomatis.</p>
+                <p>Meta Data & Keyword Injection.</p>
             </div>
 
-            <div class="menu-card" onclick="openApp('local', '', 'Remove Video Path')">
-                <i data-lucide="trash-2" color="#f43f5e" size="40"></i>
-                <h3>Remove Video Path</h3>
-                <p>Hapus metadata video (Versi Lokal).</p>
+            <div class="menu-card" onclick="openApp('local', '', 'METADATA_WIPER.sh')">
+                <i data-lucide="shield-alert" color="#ff003c" size="32"></i>
+                <h3 style="color: #ff003c;">Remove Video Path</h3>
+                <p>Secure Clean & Trace Removal.</p>
             </div>
         </div>
         
-        <footer style="margin-top: auto; padding: 2rem; color: #64748b; font-size: 0.8rem;">
-            System Ready • @Bangjeyy
+        <footer style="margin-top: auto; padding: 2rem; color: #444; font-size: 0.7rem;">
+            ENCRYPTED CONNECTION // @Bangjeyy Tools
         </footer>
     </div>
 
     <div id="app-viewer">
         <div class="top-bar">
-            <button class="btn-nav" onclick="closeApp()">
-                <i data-lucide="arrow-left" size="18"></i> KEMBALI
+            <button class="btn-back" onclick="closeApp()">
+                <i data-lucide="corner-up-left" size="14"></i> ABORT / MENU
             </button>
-            <span id="app-title" style="font-weight: bold; letter-spacing: 1px;">TITLE</span>
             
-            <button id="btn-force" class="btn-nav" style="background: rgba(99, 102, 241, 0.2); font-size: 0.8rem;" onclick="forceOpen()">
-                <i data-lucide="external-link" size="14"></i> Buka di Tab Baru
-            </button>
+            <div class="app-title-display" id="app-title">TOOLS NAME</div>
+            
+            <div style="width: 100px;"></div> 
         </div>
 
-        <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
 
         <div id="local-tool">
-            <h2 style="margin-bottom: 20px; color: #f43f5e;">SECURE METADATA REMOVER</h2>
+            <h2 style="color: var(--primary); margin-bottom: 20px; letter-spacing: 3px;">[ SECURE FILE CLEANER ]</h2>
             
             <div class="upload-box" onclick="document.getElementById('fileInput').click()">
-                <i data-lucide="upload-cloud" size="48" color="#94a3b8"></i>
-                <p style="margin-top: 15px;">Klik untuk pilih video</p>
-                <p id="fileName" style="color: #f43f5e; font-weight: bold; margin-top: 10px;"></p>
+                <i data-lucide="file-warning" size="48" color="#666"></i>
+                <p style="margin-top: 15px; color: #aaa;">CLICK TO MOUNT VIDEO FILE</p>
+                <p id="fileName" style="color: var(--primary); font-weight: bold; margin-top: 10px;"></p>
                 <input type="file" id="fileInput" style="display: none;" accept="video/*">
             </div>
 
-            <button class="btn-action" onclick="runRemovePath()">
-                <i data-lucide="eraser"></i> PROSES BERSIHKAN
+            <button class="btn-hack" onclick="executeClean()">
+                EXECUTE CLEANING
             </button>
 
-            <div id="terminal" class="log-terminal"></div>
+            <div id="terminal" class="terminal-log"></div>
         </div>
     </div>
 
     <script>
-        // Inisialisasi Icon
         lucide.createIcons();
 
-        // Variabel Global
         const dashboard = document.getElementById('dashboard-view');
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
         const titleLabel = document.getElementById('app-title');
-        const btnForce = document.getElementById('btn-force');
-        let currentUrl = "";
 
-        // Fungsi Buka Aplikasi
+        // BUKA APLIKASI
         function openApp(type, url, title) {
-            // Animasi transisi sederhana
             dashboard.style.display = 'none';
             viewer.style.display = 'flex';
             titleLabel.innerText = title;
 
             if (type === 'web') {
-                // Mode Website (Iframe)
                 iframe.style.display = 'block';
                 localTool.style.display = 'none';
-                btnForce.style.display = 'flex'; // Tampilkan tombol force
-                
-                iframe.src = url;
-                currentUrl = url;
+                iframe.src = url; // Load URL
             } else {
-                // Mode Lokal (Remove Path)
                 iframe.style.display = 'none';
                 localTool.style.display = 'flex';
-                btnForce.style.display = 'none'; // Sembunyikan tombol force
-                resetLocalTool();
+                resetLocal();
             }
         }
 
-        // Fungsi Tutup Aplikasi
+        // TUTUP APLIKASI (KEMBALI KE MENU)
         function closeApp() {
             viewer.style.display = 'none';
             dashboard.style.display = 'flex';
-            iframe.src = ""; // Stop loading
+            iframe.src = ""; // Putus koneksi iframe agar tidak jalan di background
         }
 
-        // Fungsi Paksa Buka di Tab Baru (Jika Iframe Blank)
-        function forceOpen() {
-            if(currentUrl) window.open(currentUrl, '_blank');
-        }
-
-        // --- LOGIKA REMOVE PATH (LOKAL) ---
+        // --- SCRIPT LOCAL REMOVE PATH (FAKE PROCESSING) ---
         const fileInput = document.getElementById('fileInput');
         const terminal = document.getElementById('terminal');
         const fileNameDisplay = document.getElementById('fileName');
 
         fileInput.addEventListener('change', function() {
             if (this.files[0]) {
-                fileNameDisplay.innerText = "File: " + this.files[0].name;
-                terminal.style.display = "block";
-                log("File loaded: " + this.files[0].name);
-                log("Size: " + (this.files[0].size / 1024 / 1024).toFixed(2) + " MB");
-                log("Ready to clean...");
+                fileNameDisplay.innerText = "> " + this.files[0].name;
+                terminal.style.display = 'block';
+                log("Target mounted: " + this.files[0].name);
             }
         });
 
-        function runRemovePath() {
-            if (!fileInput.files[0]) {
-                alert("Pilih file video dulu bos!");
-                return;
-            }
-
-            // Simulasi Proses Hacking/Cleaning
-            log("Initializing cleaning protocol...");
+        function executeClean() {
+            if (!fileInput.files[0]) return alert("NO TARGET FILE DETECTED!");
             
-            setTimeout(() => log("Scanning metadata headers..."), 1000);
-            setTimeout(() => log("Stripping GPS & Device Info..."), 2000);
+            log("Initializing algorithm...");
+            setTimeout(() => log("Bypassing security layers..."), 1000);
+            setTimeout(() => log("Scrubbing metadata headers..."), 2000);
             setTimeout(() => {
-                log("CLEANING COMPLETE!");
-                log("Generating safe file...");
-                downloadCleanFile(); // Trigger download palsu
+                log("SUCCESS: Path Removed.");
+                log("Generating secure download link...");
+                downloadFile();
             }, 3500);
         }
 
-        function log(text) {
-            terminal.innerHTML += "> " + text + "<br>";
+        function log(msg) {
+            terminal.innerHTML += `<div>[SYSTEM] ${msg}</div>`;
             terminal.scrollTop = terminal.scrollHeight;
         }
 
-        function downloadCleanFile() {
+        function downloadFile() {
             const file = fileInput.files[0];
-            // Membuat link download dari file asli (Simulasi)
             const url = URL.createObjectURL(file);
             const a = document.createElement('a');
             a.href = url;
-            a.download = "[CLEANED]_" + file.name; // Ganti nama file
+            a.download = "SECURE_" + file.name;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            alert("File berhasil dibersihkan dan diunduh!");
+            log("File downloaded to local drive.");
         }
 
-        function resetLocalTool() {
+        function resetLocal() {
             fileInput.value = "";
             fileNameDisplay.innerText = "";
             terminal.innerHTML = "";
