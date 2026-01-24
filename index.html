@@ -3,106 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MALES MIKIR</title>
+    <title>SECURE SYSTEM V3.0</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* --- WARNA MODE HACKER --- */
+            /* HACKER THEME */
             --hacker-green: #0f0;
+            --hacker-red: #ff003c;
             --hacker-bg: #000;
-            --hacker-panel: rgba(0, 20, 0, 0.85);
             
-            /* --- WARNA MODE PROFESIONAL --- */
-            --pro-bg: #0f172a;      /* Latar belakang biru gelap elegan */
-            --pro-panel: #1e293b;   /* Warna panel yang lebih terang */
-            --pro-text: #f1f5f9;    /* Teks putih terang */
-            --pro-accent: #6366f1;  /* Aksen ungu modern */
-            --pro-border: #334155;  /* Border halus */
+            /* PRO THEME */
+            --pro-bg: #0f172a;
+            --pro-panel: #1e293b;
+            --pro-text: #f1f5f9;
+            --pro-accent: #6366f1;
+            --pro-border: #334155;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* --- DEFAULT STYLE (PROFESIONAL MODE) --- */
         body {
-            background-color: var(--pro-bg);
-            color: var(--pro-text);
-            font-family: 'Inter', sans-serif; /* Font modern yang bersih */
+            background-color: var(--hacker-bg);
+            color: var(--hacker-green);
+            font-family: 'VT323', monospace;
             height: 100vh;
             overflow: hidden;
             transition: background-color 0.5s ease;
         }
 
-        /* --- HACKER MODE STYLES (Hanya aktif jika body punya class 'hacker-mode') --- */
-        body.hacker-mode {
-            background-color: var(--hacker-bg);
-            color: var(--hacker-green);
-            font-family: 'VT323', monospace; /* Font hacker jadul */
+        /* --- MODE TOGGLING CLASSES --- */
+        body.pro-mode {
+            background-color: var(--pro-bg);
+            color: var(--pro-text);
+            font-family: 'Inter', sans-serif;
         }
+        body.pro-mode .hacker-only { display: none !important; }
+        body:not(.pro-mode) .pro-only { display: none !important; }
 
-        body.hacker-mode .pro-element { display: none !important; } /* Sembunyikan elemen pro di mode hacker */
-        body:not(.hacker-mode) .hacker-element { display: none !important; } /* Sembunyikan elemen hacker di mode pro */
-
-        /* EFEK BACKGROUND HACKER */
-        canvas#matrix { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0; transition: opacity 0.5s; }
-        body.hacker-mode canvas#matrix { opacity: 1; }
-
+        /* --- BACKGROUND EFFECTS --- */
+        canvas#matrix { position: fixed; top: 0; left: 0; z-index: 0; }
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%);
             background-size: 100% 4px; pointer-events: none; z-index: 999;
-            opacity: 0; transition: opacity 0.5s;
         }
-        body.hacker-mode .scanlines { opacity: 1; }
 
+        /* --- 0. LOGIN SCREEN (GERBANG UTAMA) --- */
+        #login-view {
+            height: 100%; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            position: relative; z-index: 20;
+            background: rgba(0,0,0,0.8); /* Semi transparan biar matrix kelihatan */
+        }
 
-        /* --- 1. DASHBOARD VIEW (TAMPILAN AWAL) --- */
+        .login-box {
+            border: 2px solid var(--hacker-green);
+            padding: 3rem; background: #000;
+            box-shadow: 0 0 30px var(--hacker-green);
+            text-align: center; width: 90%; max-width: 500px;
+        }
+
+        .login-title { font-size: 3rem; margin-bottom: 2rem; text-shadow: 0 0 10px var(--hacker-green); }
+
+        .input-group { position: relative; width: 100%; margin-bottom: 1.5rem; }
+        
+        .login-input {
+            width: 100%; background: transparent; border: none;
+            border-bottom: 2px solid #333; color: var(--hacker-green);
+            font-size: 2rem; font-family: 'VT323', monospace;
+            text-align: center; padding: 10px; outline: none; letter-spacing: 5px;
+        }
+        .login-input:focus { border-color: var(--hacker-green); }
+
+        .btn-login {
+            background: var(--hacker-green); color: #000; border: none;
+            padding: 10px 40px; font-size: 1.5rem; cursor: pointer;
+            font-family: 'VT323', monospace; font-weight: bold;
+            transition: 0.2s; margin-top: 1rem;
+        }
+        .btn-login:hover { box-shadow: 0 0 20px var(--hacker-green); transform: scale(1.05); }
+
+        /* Error Animation */
+        .access-denied { animation: shake 0.5s; border-color: var(--hacker-red) !important; box-shadow: 0 0 30px var(--hacker-red) !important; }
+        .access-denied .login-title { color: var(--hacker-red); text-shadow: 0 0 10px var(--hacker-red); }
+        .access-denied .btn-login { background: var(--hacker-red); }
+
+        @keyframes shake {
+            0% { transform: translateX(0); } 25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } 100% { transform: translateX(0); }
+        }
+
+        /* --- 1. DASHBOARD VIEW --- */
         #dashboard-view {
-            height: 100%; overflow-y: auto;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem;
+            display: none; /* Hidden by default */
+            height: 100%; overflow-y: auto; flex-direction: column;
+            align-items: center; justify-content: center; padding: 2rem;
             position: relative; z-index: 10;
         }
 
-        /* Header Glitch (Hacker Mode Only) - DIPERBAIKI */
         .glitch-wrapper { text-align: center; margin-bottom: 4rem; }
-        
         .main-icon-wrapper {
-            display: inline-block;
-            margin-bottom: 1rem;
-            padding: 15px;
-            border: 3px solid var(--hacker-green);
-            border-radius: 50%;
-            box-shadow: 0 0 25px var(--hacker-green);
-            background: rgba(0, 20, 0, 0.8);
+            display: inline-block; margin-bottom: 1rem; padding: 15px;
+            border: 3px solid var(--hacker-green); border-radius: 50%;
+            box-shadow: 0 0 25px var(--hacker-green); background: rgba(0, 20, 0, 0.8);
         }
-
         h1.clear-title {
-            font-family: 'Inter', sans-serif; /* Ganti font jadi lebih jelas */
-            font-size: 4.5rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            color: var(--hacker-green);
-            text-shadow: 0 0 15px rgba(0, 255, 0, 0.6); /* Glow halus, bukan glitch */
-            margin: 0;
+            font-family: 'Inter', sans-serif; font-size: 4rem; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 3px; color: var(--hacker-green);
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.6); margin: 0;
         }
-
         .system-status {
             border: 1px solid var(--hacker-green); padding: 8px 25px;
             font-size: 1.3rem; background: rgba(0,0,0,0.7);
             box-shadow: 0 0 15px var(--hacker-green); margin-top: 20px; display: inline-block;
-            font-family: 'VT323', monospace; /* Status tetap pakai font hacker */
         }
 
-        /* Menu Grid */
         .grid-menu {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 2.5rem; width: 100%; max-width: 1200px;
         }
-
         .menu-card {
-            background: var(--hacker-panel); border: 2px solid #004400;
+            background: rgba(0, 20, 0, 0.85); border: 2px solid #004400;
             padding: 2.5rem; cursor: pointer; transition: 0.3s;
             position: relative; overflow: hidden; text-align: left;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
@@ -115,21 +138,17 @@
         .menu-card p { font-size: 1.2rem; color: #00cc00; }
         .card-num { font-size: 3rem; opacity: 0.3; position: absolute; top: 10px; right: 20px; font-weight: bold; }
 
-
-        /* --- 2. APP VIEWER (TAMPILAN DALAM TOOLS - BERSIH & RAPI) --- */
+        /* --- 2. APP VIEWER (PRO MODE) --- */
         #app-viewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--pro-bg); z-index: 100; display: none; flex-direction: column;
         }
 
-        /* Top Navigation Bar Modern */
         .top-bar {
-            height: 65px; background: var(--pro-panel);
-            border-bottom: 1px solid var(--pro-border);
+            height: 65px; background: var(--pro-panel); border-bottom: 1px solid var(--pro-border);
             display: flex; align-items: center; justify-content: space-between; padding: 0 2rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-
         .btn-back {
             background: transparent; border: 1px solid var(--pro-border);
             color: var(--pro-text); padding: 8px 16px; font-size: 0.95rem;
@@ -137,82 +156,67 @@
             transition: 0.2s; border-radius: 8px; font-weight: 600; font-family: 'Inter', sans-serif;
         }
         .btn-back:hover { background: var(--pro-border); }
-        .btn-back i { color: var(--pro-accent); }
-
         #app-title { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; }
-
-        /* Iframe (Website Luar) */
         iframe { flex: 1; border: none; background: #fff; }
 
-
-        /* --- 3. TOOL LOCAL UI (Path Remove - Tampilan Bersih) --- */
+        /* --- TOOL UI --- */
         #local-tool {
             flex: 1; display: none; padding: 3rem;
-            background: var(--pro-bg);
-            align-items: flex-start; justify-content: center;
+            background: var(--pro-bg); align-items: flex-start; justify-content: center;
         }
-
-        .tool-layout {
-            display: flex; gap: 2rem; height: 100%; width: 100%; max-width: 1200px; margin: 0 auto;
-        }
-
+        .tool-layout { display: flex; gap: 2rem; height: 100%; width: 100%; max-width: 1200px; margin: 0 auto; }
         .panel-box {
             flex: 1; display: flex; flex-direction: column;
             background: var(--pro-panel); border-radius: 12px;
             border: 1px solid var(--pro-border); overflow: hidden;
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
-
         .panel-header {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 15px 20px; font-weight: 600; font-size: 1rem;
-            border-bottom: 1px solid var(--pro-border);
-            display: flex; align-items: center; gap: 10px;
+            background: rgba(255, 255, 255, 0.03); padding: 15px 20px; font-weight: 600;
+            border-bottom: 1px solid var(--pro-border); display: flex; align-items: center; gap: 10px;
         }
-        .panel-header i { color: var(--pro-accent); }
-
         textarea {
             flex: 1; background: transparent; border: none; color: var(--pro-text);
-            font-size: 0.95rem; padding: 20px; resize: none; outline: none;
-            font-family: 'Inter', sans-serif; line-height: 1.6;
+            font-size: 0.95rem; padding: 20px; resize: none; outline: none; font-family: 'Inter', sans-serif;
         }
-        textarea::placeholder { color: #64748b; }
-        
-        .controls-middle {
-            display: flex; flex-direction: column; justify-content: center; gap: 1rem;
-        }
-
+        .controls-middle { display: flex; flex-direction: column; justify-content: center; gap: 1rem; }
         .btn-process {
-            background: var(--pro-accent); color: white; border: none;
-            width: 50px; height: 50px; border-radius: 12px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            transition: 0.2s; box-shadow: 0 4px 6px rgba(99, 102, 241, 0.25);
+            background: var(--pro-accent); color: white; border: none; width: 50px; height: 50px;
+            border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s;
         }
-        .btn-process:hover { transform: scale(1.05); background: #4f46e5; }
-
+        .btn-process:hover { transform: scale(1.05); }
         .btn-copy {
-            background: transparent; border: 1px solid var(--pro-border);
-            color: var(--pro-text); padding: 12px; text-align: center;
-            cursor: pointer; transition: 0.2s; font-weight: 600;
-            border-top: 1px solid var(--pro-border);
-            font-family: 'Inter', sans-serif;
+            background: transparent; border-top: 1px solid var(--pro-border); color: var(--pro-text);
+            padding: 12px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif;
         }
-        .btn-copy:hover { background: rgba(255, 255, 255, 0.05); color: var(--pro-accent); }
+        .btn-copy:hover { background: rgba(255,255,255,0.05); color: var(--pro-accent); }
 
     </style>
 </head>
-<body class="hacker-mode" oncontextmenu="return false;">
+<body oncontextmenu="return false;">
 
-    <canvas id="matrix" class="hacker-element"></canvas>
-    <div class="scanlines hacker-element"></div>
+    <canvas id="matrix"></canvas>
+    <div class="scanlines"></div>
 
-    <div id="dashboard-view">
-        <div class="glitch-wrapper hacker-element">
+    <div id="login-view">
+        <div class="login-box" id="loginBox">
+            <div class="login-title">SECURE LOGIN</div>
+            <div class="input-group">
+                <input type="password" id="passInput" class="login-input" placeholder="ENTER ACCESS CODE" autocomplete="off">
+            </div>
+            <button class="btn-login" onclick="checkLogin()">UNLOCK SYSTEM</button>
+            <div id="loginMsg" style="margin-top: 10px; min-height: 20px; color: var(--hacker-red);"></div>
+        </div>
+    </div>
+
+    <div id="dashboard-view" class="hacker-only">
+        <div class="glitch-wrapper">
             <div class="main-icon-wrapper">
                 <i data-lucide="bot" size="70" color="#0f0"></i>
             </div>
-            <h1 class="clear-title">MALES MIKIR</h1>
-            <div class="system-status">● SYSTEM CONNECTED: @BANGJEYY</div>
+            <h1 class="clear-title">MALES MIKIR_V3.0</h1>
+            <div class="system-status">● AUTHORIZED ACCESS: @BANGJEYY</div>
         </div>
 
         <div class="grid-menu">
@@ -220,62 +224,47 @@
                 <div class="card-num">01</div>
                 <i data-lucide="scan-face" size="45" color="#0f0"></i>
                 <h3>IDENTIFIKASI GAMBAR</h3>
-                <p>>Tools Metadata Identifikasi Gambar</p>
+                <p>> Execute Visual AI Protocol...</p>
             </div>
-
             <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO Generator')">
                 <div class="card-num">02</div>
                 <i data-lucide="binary" size="45" color="#0f0"></i>
                 <h3>SEO GENERATOR</h3>
-                <p>> Metadata khusus title, Desk & Keyword</p>
+                <p>> Inject Meta Keywords...</p>
             </div>
-
             <div class="menu-card" onclick="openApp('local', '', 'Remove Path Name')">
                 <div class="card-num">03</div>
                 <i data-lucide="file-code" size="45" color="#ff0055"></i>
                 <h3 style="color:#ff0055;">REMOVE PATH NAME</h3>
-                <p>>Hapus Path Anda Disini Untuk Keperluan CSV</p>
+                <p>> Extract Filename from String...</p>
             </div>
         </div>
     </div>
 
     <div id="app-viewer">
-        <div class="top-bar pro-element">
+        <div class="top-bar pro-only">
             <button class="btn-back" onclick="closeApp()">
                 <i data-lucide="arrow-left"></i> Kembali ke Menu
             </button>
-            <div id="app-title">Nama Tools</div>
-            <div style="width: 100px;"></div> </div>
-
+            <div id="app-title">Tools Name</div>
+            <div style="width: 100px;"></div>
+        </div>
         <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-
-        <div id="local-tool" class="pro-element">
+        
+        <div id="local-tool" class="pro-only">
             <div class="tool-layout">
                 <div class="panel-box">
-                    <div class="panel-header">
-                        <i data-lucide="log-in"></i> Input Path (Paste di sini)
-                    </div>
-                    <textarea id="inputText" placeholder='Contoh: "C:\Users\Data\VideoLiburan.mp4"
-Paste daftar path panjang Anda di sini...'></textarea>
+                    <div class="panel-header"><i data-lucide="log-in"></i> Input Path</div>
+                    <textarea id="inputText" placeholder='Paste path di sini...'></textarea>
                 </div>
-
                 <div class="controls-middle">
-                    <button class="btn-process" onclick="processPath()" title="Proses Path">
-                        <i data-lucide="arrow-right" size="24"></i>
-                    </button>
-                    <button class="btn-process" onclick="clearAll()" title="Hapus Semua" style="background: #ef4444;">
-                        <i data-lucide="trash-2" size="24"></i>
-                    </button>
+                    <button class="btn-process" onclick="processPath()"><i data-lucide="arrow-right"></i></button>
+                    <button class="btn-process" onclick="clearAll()" style="background:#ef4444;"><i data-lucide="trash-2"></i></button>
                 </div>
-
                 <div class="panel-box">
-                    <div class="panel-header">
-                        <i data-lucide="log-out"></i> Output (Nama File Bersih)
-                    </div>
-                    <textarea id="outputText" readonly placeholder="Hasil nama file akan muncul di sini..."></textarea>
-                    <button class="btn-copy" onclick="copyResult()">
-                        <i data-lucide="copy" style="display: inline; margin-right:5px;"></i> Salin Hasil
-                    </button>
+                    <div class="panel-header"><i data-lucide="log-out"></i> Output</div>
+                    <textarea id="outputText" readonly></textarea>
+                    <button class="btn-copy" onclick="copyResult()">Salin Hasil</button>
                 </div>
             </div>
         </div>
@@ -284,19 +273,21 @@ Paste daftar path panjang Anda di sini...'></textarea>
     <script>
         lucide.createIcons();
 
-        /* --- SCRIPT EFEK MATRIX RAIN --- */
+        /* --- SETTING PASSWORD DI SINI --- */
+        const CORRECT_PASS = "Bangjeyy123"; 
+        /* Ganti "admin123" dengan password yang Anda mau */
+
+        // Matrix Effect
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
         let matrixInterval;
-
         function startMatrix() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*";
+            const letters = "01010101MALESMIKIR";
             const fontSize = 16;
             const columns = canvas.width / fontSize;
             const drops = Array(Math.floor(columns)).fill(1);
-
             function draw() {
                 ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -311,82 +302,90 @@ Paste daftar path panjang Anda di sini...'></textarea>
             }
             matrixInterval = setInterval(draw, 33);
         }
-
-        function stopMatrix() {
-            clearInterval(matrixInterval);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
-        
-        // Jalankan matrix saat awal load
         startMatrix();
-        window.addEventListener('resize', () => { if(document.body.classList.contains('hacker-mode')) { stopMatrix(); startMatrix(); }});
+        window.addEventListener('resize', () => { 
+            if(!document.body.classList.contains('pro-mode')) { clearInterval(matrixInterval); startMatrix(); }
+        });
 
-
-        /* --- LOGIKA NAVIGASI & GANTI MODE TAMPILAN --- */
+        // --- LOGIN LOGIC ---
+        const loginView = document.getElementById('login-view');
         const dashboard = document.getElementById('dashboard-view');
+        const loginBox = document.getElementById('loginBox');
+        const passInput = document.getElementById('passInput');
+
+        // Bisa tekan ENTER untuk login
+        passInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") checkLogin();
+        });
+
+        function checkLogin() {
+            const val = passInput.value;
+            if(val === CORRECT_PASS) {
+                // SUKSES
+                loginBox.innerHTML = "<h2 style='color:#0f0; font-size:2rem;'>ACCESS GRANTED</h2><p>LOADING MODULES...</p>";
+                setTimeout(() => {
+                    loginView.style.display = 'none';
+                    dashboard.style.display = 'flex';
+                }, 1500);
+            } else {
+                // GAGAL
+                loginBox.classList.add('access-denied');
+                document.getElementById('loginMsg').innerText = "ACCESS DENIED: INCORRECT CODE";
+                passInput.value = "";
+                setTimeout(() => {
+                    loginBox.classList.remove('access-denied');
+                    document.getElementById('loginMsg').innerText = "";
+                }, 1000);
+            }
+        }
+
+        // --- NAVIGATION & TOOLS ---
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
         const titleLabel = document.getElementById('app-title');
 
-        // BUKA TOOL (Pindah ke Mode Profesional)
         function openApp(type, url, title) {
-            // 1. Matikan Efek Hacker
-            document.body.classList.remove('hacker-mode');
-            stopMatrix();
+            document.body.classList.add('pro-mode'); // Ganti tema ke PRO
+            clearInterval(matrixInterval); ctx.clearRect(0,0,canvas.width,canvas.height); // Stop Matrix
             
-            // 2. Tampilkan Viewer
             dashboard.style.display = 'none';
             viewer.style.display = 'flex';
             titleLabel.innerText = title;
-            lucide.createIcons(); // Refresh icon di top bar
+            lucide.createIcons();
 
-            // 3. Pilih Konten
             if (type === 'web') {
-                iframe.style.display = 'block';
-                localTool.style.display = 'none';
-                iframe.src = url;
+                iframe.style.display = 'block'; localTool.style.display = 'none'; iframe.src = url;
             } else {
-                iframe.style.display = 'none';
-                localTool.style.display = 'flex';
+                iframe.style.display = 'none'; localTool.style.display = 'flex';
                 document.getElementById('inputText').focus();
             }
         }
 
-        // KEMBALI KE MENU (Pindah ke Mode Hacker)
         function closeApp() {
-            // 1. Nyalakan Efek Hacker
-            document.body.classList.add('hacker-mode');
-            startMatrix();
-
-            // 2. Tampilkan Dashboard
+            document.body.classList.remove('pro-mode'); // Balik tema HACKER
+            startMatrix(); // Mulai Matrix
+            
             viewer.style.display = 'none';
             dashboard.style.display = 'flex';
-            iframe.src = ""; // Reset iframe
-            clearAll(); // Reset tool lokal
+            iframe.src = "";
+            clearAll();
         }
 
-        /* --- FUNGSI TOOL REMOVE PATH --- */
         function processPath() {
-            const rawText = document.getElementById('inputText').value;
-            const lines = rawText.split('\n');
+            const lines = document.getElementById('inputText').value.split('\n');
             let result = "";
             lines.forEach(line => {
-                let cleanLine = line.trim().replace(/"/g, '');
-                if (cleanLine) {
-                    const parts = cleanLine.split('\\');
-                    result += parts[parts.length - 1] + "\n";
-                }
+                let clean = line.trim().replace(/"/g, '');
+                if (clean) result += clean.split('\\').pop() + "\n";
             });
             document.getElementById('outputText').value = result;
         }
 
         function copyResult() {
-            const copyText = document.getElementById("outputText");
-            if(!copyText.value) return alert("Tidak ada hasil untuk disalin!");
-            copyText.select();
-            document.execCommand("copy");
-            alert("Hasil berhasil disalin ke clipboard!");
+            const el = document.getElementById("outputText");
+            el.select(); document.execCommand("copy");
+            alert("Hasil disalin!");
         }
 
         function clearAll() {
