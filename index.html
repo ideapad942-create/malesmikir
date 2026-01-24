@@ -64,17 +64,35 @@
             position: relative; z-index: 10;
         }
 
-        /* Header Glitch (Hacker Mode Only) */
+        /* Header Glitch (Hacker Mode Only) - DIPERBAIKI */
         .glitch-wrapper { text-align: center; margin-bottom: 4rem; }
-        h1.glitch {
-            font-size: 5rem; font-weight: bold; text-transform: uppercase;
-            text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff;
-            animation: glitch 725ms infinite; letter-spacing: 5px;
+        
+        .main-icon-wrapper {
+            display: inline-block;
+            margin-bottom: 1rem;
+            padding: 15px;
+            border: 3px solid var(--hacker-green);
+            border-radius: 50%;
+            box-shadow: 0 0 25px var(--hacker-green);
+            background: rgba(0, 20, 0, 0.8);
         }
+
+        h1.clear-title {
+            font-family: 'Inter', sans-serif; /* Ganti font jadi lebih jelas */
+            font-size: 4.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--hacker-green);
+            text-shadow: 0 0 15px rgba(0, 255, 0, 0.6); /* Glow halus, bukan glitch */
+            margin: 0;
+        }
+
         .system-status {
             border: 1px solid var(--hacker-green); padding: 8px 25px;
             font-size: 1.3rem; background: rgba(0,0,0,0.7);
-            box-shadow: 0 0 15px var(--hacker-green); margin-top: 15px; display: inline-block;
+            box-shadow: 0 0 15px var(--hacker-green); margin-top: 20px; display: inline-block;
+            font-family: 'VT323', monospace; /* Status tetap pakai font hacker */
         }
 
         /* Menu Grid */
@@ -181,16 +199,6 @@
         }
         .btn-copy:hover { background: rgba(255, 255, 255, 0.05); color: var(--pro-accent); }
 
-        /* ANIMASI GLITCH (Hanya jalan di mode hacker) */
-        @keyframes glitch {
-            0% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff; }
-            15% { text-shadow: 0.05em 0 0 #00fffc, -0.03em -0.04em 0 #fc00ff; }
-            16% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff; }
-            49% { text-shadow: -0.05em -0.025em 0 #00fffc, 0.025em 0.035em 0 #fc00ff; }
-            50% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff; }
-            99% { text-shadow: 0.05em 0.035em 0 #00fffc, 0.03em 0 0 #fc00ff; }
-            100% { text-shadow: -0.05em 0 0 #00fffc, -0.025em -0.04em 0 #fc00ff; }
-        }
     </style>
 </head>
 <body class="hacker-mode" oncontextmenu="return false;">
@@ -200,7 +208,10 @@
 
     <div id="dashboard-view">
         <div class="glitch-wrapper hacker-element">
-            <h1 class="glitch">MALES MIKIR_V3.0</h1>
+            <div class="main-icon-wrapper">
+                <i data-lucide="bot" size="70" color="#0f0"></i>
+            </div>
+            <h1 class="clear-title">MALES MIKIR_V3.0</h1>
             <div class="system-status">● SYSTEM CONNECTED: @BANGJEYY</div>
         </div>
 
