@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MALES MIKIR | ACCESS SYSTEM</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,24 +12,23 @@
            1. VARIABLE & RESET
            ========================================= */
         :root {
-            /* TEMA HACKER (Default Body) */
+            /* TEMA HACKER */
             --hack-bg: #050505;
             --hack-green: #0f0;
             --hack-font: 'VT323', monospace;
 
-            /* TEMA NORMAL/CLEAN (Saat Tool Dibuka) */
-            --clean-bg: #f3f4f6;       /* Abu-abu sangat muda */
-            --clean-card: #ffffff;     /* Putih bersih */
-            --clean-text: #1f2937;     /* Hitam soft */
-            --clean-border: #e5e7eb;   /* Garis halus */
-            --clean-primary: #3b82f6;  /* Biru profesional */
-            --clean-danger: #ef4444;   /* Merah soft */
+            /* TEMA CLEAN */
+            --clean-bg: #f3f4f6;
+            --clean-card: #ffffff;
+            --clean-text: #1f2937;
+            --clean-border: #e5e7eb;
+            --clean-primary: #3b82f6;
+            --clean-danger: #ef4444;
             --clean-font: 'Inter', sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Default: Tampilan Hacker */
         body {
             background-color: var(--hack-bg);
             color: var(--hack-green);
@@ -39,24 +38,18 @@
             transition: all 0.5s ease;
         }
 
-        /* Kelas Khusus Saat Masuk Mode Normal/Clean */
+        /* Mode Clean */
         body.mode-clean {
             background-color: var(--clean-bg);
             color: var(--clean-text);
             font-family: var(--clean-font);
         }
-
-        /* Sembunyikan elemen hacker saat mode clean aktif */
-        body.mode-clean #matrix, 
-        body.mode-clean .scanlines,
-        body.mode-clean .hacker-only { display: none !important; }
-
-        /* Sembunyikan elemen clean saat mode hacker aktif */
+        body.mode-clean #matrix, body.mode-clean .scanlines, body.mode-clean .hacker-only { display: none !important; }
         body:not(.mode-clean) .clean-only { display: none !important; }
 
 
         /* =========================================
-           2. BACKGROUND EFFECTS (HACKER ONLY)
+           2. BACKGROUND EFFECTS & ANIMATIONS
            ========================================= */
         canvas#matrix { position: fixed; top: 0; left: 0; z-index: 0; }
         .scanlines {
@@ -65,41 +58,55 @@
             background-size: 100% 4px; pointer-events: none; z-index: 999;
         }
 
+        /* --- INTRO ANIMATION SCREEN --- */
+        #intro-view {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 50; display: none;
+            align-items: center; justify-content: center; flex-direction: column;
+        }
+        #typewriter-text {
+            font-size: 2rem; color: var(--hack-green);
+            text-shadow: 0 0 10px var(--hack-green);
+            text-align: center; padding: 20px;
+        }
+        .cursor { display: inline-block; width: 10px; height: 1.5rem; background: var(--hack-green); animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
 
         /* =========================================
-           3. LOGIN SCREEN (HACKER THEME)
+           3. LOGIN SCREEN (RESPONSIVE)
            ========================================= */
         #login-view {
             height: 100%; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
             position: relative; z-index: 20; background: rgba(0,0,0,0.95);
+            padding: 20px;
         }
 
         .login-box {
-            border: 2px solid var(--hack-green); padding: 3rem;
+            border: 2px solid var(--hack-green); padding: 2rem;
             background: #000; box-shadow: 0 0 25px var(--hack-green);
-            text-align: center; width: 90%; max-width: 450px;
+            text-align: center; width: 100%; max-width: 450px;
         }
 
         .login-input {
             width: 100%; background: transparent; border: none;
             border-bottom: 2px solid #333; color: var(--hack-green);
-            font-size: 2rem; font-family: var(--hack-font); text-align: center;
+            font-size: 1.5rem; font-family: var(--hack-font); text-align: center;
             padding: 10px; outline: none; margin-bottom: 20px; letter-spacing: 3px;
         }
         .login-input:focus { border-color: var(--hack-green); }
 
         .btn-login {
             background: var(--hack-green); color: #000; border: none;
-            padding: 10px 40px; font-size: 1.5rem; cursor: pointer;
+            padding: 12px; font-size: 1.2rem; cursor: pointer;
             font-family: var(--hack-font); font-weight: bold; width: 100%;
             transition: 0.3s;
         }
-        .btn-login:hover { transform: scale(1.02); box-shadow: 0 0 15px var(--hack-green); }
 
 
         /* =========================================
-           4. DASHBOARD MENU (HACKER THEME)
+           4. DASHBOARD MENU (RESPONSIVE)
            ========================================= */
         #dashboard-view {
             display: none; height: 100%; overflow-y: auto;
@@ -107,8 +114,11 @@
             position: relative; z-index: 10;
         }
 
-        .header-title { text-align: center; margin-bottom: 3rem; }
-        .header-title h1 { font-size: 4rem; text-shadow: 0 0 10px var(--hack-green); letter-spacing: 2px; }
+        .header-title { text-align: center; margin-bottom: 2rem; width: 100%; }
+        .header-title h1 { 
+            font-size: 4rem; text-shadow: 0 0 10px var(--hack-green); 
+            letter-spacing: 2px; line-height: 1; margin-top: 10px;
+        }
         
         .grid-menu {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -120,16 +130,11 @@
             padding: 2rem; cursor: pointer; transition: 0.3s;
             position: relative; overflow: hidden;
         }
-        .menu-card:hover {
-            border-color: var(--hack-green);
-            box-shadow: 0 0 20px var(--hack-green);
-            transform: translateY(-5px);
-        }
-        .menu-card h3 { font-size: 2rem; margin: 10px 0; color: #fff; }
+        .menu-card:active { transform: scale(0.98); }
 
 
         /* =========================================
-           5. APP VIEWER (CLEAN / NORMAL THEME)
+           5. APP VIEWER (CLEAN & RESPONSIVE)
            ========================================= */
         #app-viewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -137,54 +142,51 @@
             display: none; flex-direction: column;
         }
 
-        /* Top Bar yang Bersih (Putih) */
         .top-bar-clean {
             height: 60px; background: var(--clean-card);
             border-bottom: 1px solid var(--clean-border);
             display: flex; align-items: center; justify-content: space-between;
-            padding: 0 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            padding: 0 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            flex-shrink: 0; /* Agar header gak kegencet */
         }
 
         .btn-back-clean {
             background: transparent; border: 1px solid var(--clean-border);
-            color: var(--clean-text); padding: 8px 15px; border-radius: 6px;
-            font-size: 0.9rem; font-weight: 600; cursor: pointer;
-            display: flex; align-items: center; gap: 8px; transition: 0.2s;
+            color: var(--clean-text); padding: 8px 12px; border-radius: 6px;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; gap: 5px;
         }
-        .btn-back-clean:hover { background: #f9fafb; border-color: #d1d5db; }
 
-        #app-title-clean { font-weight: 600; font-size: 1.1rem; color: #111; }
+        #app-title-clean { font-weight: 600; font-size: 1rem; color: #111; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px; }
 
-        iframe { flex: 1; border: none; background: #fff; }
+        iframe { flex: 1; border: none; background: #fff; width: 100%; }
 
 
         /* =========================================
-           6. LOCAL TOOL: PATH REMOVER (TAMPILAN NORMAL)
+           6. LOCAL TOOL (RESPONSIVE STACK)
            ========================================= */
         #local-tool {
             flex: 1; display: none; padding: 2rem;
-            background: var(--clean-bg);
-            align-items: flex-start; justify-content: center;
+            background: var(--clean-bg); overflow-y: auto;
         }
 
         .clean-container {
             width: 100%; max-width: 900px; margin: 0 auto;
-            display: flex; gap: 1.5rem; height: 80vh;
+            display: flex; gap: 1.5rem; height: 100%;
         }
 
         .clean-card {
             flex: 1; background: var(--clean-card);
             border: 1px solid var(--clean-border);
-            border-radius: 10px;
-            display: flex; flex-direction: column;
+            border-radius: 10px; display: flex; flex-direction: column;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            min-height: 200px; /* Minimal tinggi di HP */
         }
 
         .clean-header {
-            padding: 15px; border-bottom: 1px solid var(--clean-border);
+            padding: 12px 15px; border-bottom: 1px solid var(--clean-border);
             font-weight: 600; color: #374151; background: #f9fafb;
-            display: flex; align-items: center; gap: 8px;
+            display: flex; align-items: center; gap: 8px; font-size: 0.9rem;
         }
 
         textarea {
@@ -192,7 +194,6 @@
             font-family: 'Inter', sans-serif; font-size: 0.9rem;
             color: #1f2937; outline: none; line-height: 1.6;
         }
-        textarea:focus { background: #feffff; }
 
         .middle-actions {
             display: flex; flex-direction: column; justify-content: center; gap: 10px;
@@ -202,19 +203,37 @@
             width: 50px; height: 50px; border-radius: 8px; border: none;
             background: var(--clean-primary); color: white;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.2s; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
         }
-        .btn-clean-action:hover { transform: translateY(-2px); background: #2563eb; }
         
-        .btn-clean-danger { background: var(--clean-danger); box-shadow: 0 2px 4px rgba(239, 68, 68, 0.3); }
-        .btn-clean-danger:hover { background: #dc2626; }
+        .btn-clean-danger { background: var(--clean-danger); }
 
         .btn-clean-copy {
-            width: 100%; padding: 12px; border: none; border-top: 1px solid var(--clean-border);
+            width: 100%; padding: 15px; border: none; border-top: 1px solid var(--clean-border);
             background: #fff; color: var(--clean-primary); font-weight: 600;
-            cursor: pointer; transition: 0.2s;
+            cursor: pointer;
         }
-        .btn-clean-copy:hover { background: #eff6ff; }
+
+
+        /* =========================================
+           7. MEDIA QUERIES (HP / MOBILE MODE)
+           ========================================= */
+        @media (max-width: 768px) {
+            /* Dashboard Mobile */
+            .header-title h1 { font-size: 2.5rem; }
+            .grid-menu { grid-template-columns: 1fr; gap: 1rem; }
+            #dashboard-view { padding: 1rem; }
+            
+            /* Tool Clean Mobile (Stack Vertical) */
+            .clean-container { flex-direction: column; height: auto; }
+            .middle-actions { flex-direction: row; padding: 10px 0; }
+            .btn-clean-action { width: 100%; height: 45px; } /* Tombol jadi lebar */
+            
+            /* Login Box Mobile */
+            .login-box { padding: 1.5rem; width: 100%; }
+            
+            /* Intro Text Mobile */
+            #typewriter-text { font-size: 1.5rem; }
+        }
 
     </style>
 </head>
@@ -225,34 +244,39 @@
 
     <div id="login-view">
         <div class="login-box" id="loginBox">
-            <h2 style="margin-bottom: 20px; font-size: 2rem;">SECURE SYSTEM</h2>
-            <input type="password" id="passInput" class="login-input" placeholder="ENTER PASSWORD" autocomplete="off">
-            <button class="btn-login" onclick="verifyUser()">UNLOCK</button>
+            <h2 style="margin-bottom: 20px; font-size: 2rem;">SECURE LOGIN</h2>
+            <input type="password" id="passInput" class="login-input" placeholder="PASSWORD" autocomplete="off">
+            <button class="btn-login" onclick="verifyUser()">UNLOCK SYSTEM</button>
             <div id="errorMsg" style="color: red; margin-top: 10px; display: none;">ACCESS DENIED</div>
         </div>
     </div>
 
+    <div id="intro-view">
+        <div id="typewriter-text"></div>
+        <div class="cursor"></div>
+    </div>
+
     <div id="dashboard-view" class="hacker-only">
         <div class="header-title">
-            <div style="font-size: 1.2rem; border: 1px solid #0f0; display: inline-block; padding: 5px 15px; margin-bottom: 20px;">
-                WELCOME: <span id="userNameDisplay">USER</span>
+            <div style="font-size: 1rem; border: 1px solid #0f0; display: inline-block; padding: 5px 10px; margin-bottom: 10px;">
+                CONNECTED: <span id="userNameDisplay">USER</span>
             </div>
             <h1>MALES MIKIR V3.0</h1>
         </div>
 
         <div class="grid-menu">
             <div class="menu-card" onclick="openApp('web', 'https://robot-rho-dusky.vercel.app/', 'Identifikasi Gambar')">
-                <i data-lucide="scan-face" size="40"></i>
+                <i data-lucide="scan-face" size="35"></i>
                 <h3>[1] IDENTIFIKASI GAMBAR</h3>
                 <p>> Visual Analysis Tool</p>
             </div>
             <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO Generator')">
-                <i data-lucide="binary" size="40"></i>
+                <i data-lucide="binary" size="35"></i>
                 <h3>[2] SEO GENERATOR</h3>
                 <p>> Keyword & Meta Tool</p>
             </div>
             <div class="menu-card" onclick="openApp('local', '', 'Remove Path Name')">
-                <i data-lucide="scissors" size="40" color="#ff0055"></i>
+                <i data-lucide="scissors" size="35" color="#ff0055"></i>
                 <h3 style="color:#ff0055;">[3] REMOVE PATH NAME</h3>
                 <p>> Clean Filename Extractor</p>
             </div>
@@ -262,10 +286,10 @@
     <div id="app-viewer">
         <div class="top-bar-clean clean-only">
             <button class="btn-back-clean" onclick="closeApp()">
-                <i data-lucide="arrow-left" size="18"></i> Kembali Menu Utama
+                <i data-lucide="arrow-left" size="16"></i> MENU
             </button>
             <div id="app-title-clean">Tools Name</div>
-            <div style="width: 100px;"></div>
+            <div style="width: 50px;"></div>
         </div>
 
         <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
@@ -273,29 +297,17 @@
         <div id="local-tool" class="clean-only">
             <div class="clean-container">
                 <div class="clean-card">
-                    <div class="clean-header">
-                        <i data-lucide="file-input" size="18"></i> Input Path (Paste Disini)
-                    </div>
-                    <textarea id="inputText" placeholder='Contoh: "C:\Users\Downloads\Foto.jpg" (Satu per baris)'></textarea>
+                    <div class="clean-header"><i data-lucide="file-input" size="16"></i> Input Path</div>
+                    <textarea id="inputText" placeholder='Paste path di sini...'></textarea>
                 </div>
-
                 <div class="middle-actions">
-                    <button class="btn-clean-action" onclick="processPath()" title="Proses">
-                        <i data-lucide="arrow-right" size="24"></i>
-                    </button>
-                    <button class="btn-clean-action btn-clean-danger" onclick="clearAll()" title="Hapus">
-                        <i data-lucide="trash-2" size="24"></i>
-                    </button>
+                    <button class="btn-clean-action" onclick="processPath()" title="Proses"><i data-lucide="arrow-down" size="24"></i></button>
+                    <button class="btn-clean-action btn-clean-danger" onclick="clearAll()" title="Hapus"><i data-lucide="trash-2" size="24"></i></button>
                 </div>
-
                 <div class="clean-card">
-                    <div class="clean-header">
-                        <i data-lucide="file-output" size="18"></i> Hasil (Nama File Saja)
-                    </div>
-                    <textarea id="outputText" readonly placeholder="Hasil akan muncul di sini..."></textarea>
-                    <button class="btn-clean-copy" onclick="copyResult()">
-                        <i data-lucide="copy" style="display:inline; margin-right:5px;" size="16"></i> Salin Semua Hasil
-                    </button>
+                    <div class="clean-header"><i data-lucide="file-output" size="16"></i> Output Hasil</div>
+                    <textarea id="outputText" readonly></textarea>
+                    <button class="btn-clean-copy" onclick="copyResult()"><i data-lucide="copy" style="display:inline; margin-right:5px;" size="14"></i> Salin</button>
                 </div>
             </div>
         </div>
@@ -304,163 +316,153 @@
     <script>
         lucide.createIcons();
 
-        /* =========================================
-           DATABASE USER (Setting Password Disini)
-           ========================================= */
+        // --- DATABASE PASSWORD ---
         const USERS_DB = {
             "admin": "ADMINISTRATOR",
-            "tamu": "PENGUNJUNG",
-            // Tambah sendiri: "sandi": "nama",
+            "tamu": "GUEST USER",
         };
 
-        /* =========================================
-           1. AUTO LOCK SYSTEM (10 MENIT)
-           ========================================= */
-        let idleTime = 0;
-        const TIMEOUT_LIMIT = 10; // 10 Menit
-
-        // Fungsi Timer
-        setInterval(function() {
-            // Jika login view tidak aktif, hitung waktu
-            if(document.getElementById('login-view').style.display === 'none'){
-                idleTime++;
-                if (idleTime >= TIMEOUT_LIMIT) {
-                    lockSystem();
-                }
-            }
-        }, 60000); // Cek setiap 1 menit
-
-        // Reset timer jika ada gerakan mouse atau ketikan
-        function resetTimer() { idleTime = 0; }
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-
-        function lockSystem() {
-            closeApp(); // Tutup aplikasi jika terbuka
-            document.getElementById('dashboard-view').style.display = 'none';
-            document.getElementById('login-view').style.display = 'flex';
-            document.getElementById('passInput').value = "";
-            alert("Sesi habis (10 Menit). Silakan login kembali.");
-        }
-
-
-        /* =========================================
-           2. MATRIX EFFECT (HANYA MODE HACKER)
-           ========================================= */
-        const canvas = document.getElementById('matrix');
-        const ctx = canvas.getContext('2d');
-        let matrixInterval;
-        
-        function startMatrix() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            const letters = "010101MALESMIKIR";
-            const fontSize = 16;
-            const drops = Array(Math.floor(canvas.width/fontSize)).fill(1);
+        // --- LOGIKA ANIMASI INTRO ---
+        function playIntroAnimation(userName) {
+            const introView = document.getElementById('intro-view');
+            const typeText = document.getElementById('typewriter-text');
+            const fullText = `ACCESS GRANTED...\nSELAMAT DATANG DI TOOLS MALES MIKIR\nUSER: ${userName}`;
             
-            function draw() {
-                ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = "#0F0";
-                ctx.font = fontSize + "px monospace";
-                for (let i = 0; i < drops.length; i++) {
-                    const text = letters.charAt(Math.floor(Math.random() * letters.length));
-                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                    drops[i]++;
+            document.getElementById('login-view').style.display = 'none';
+            introView.style.display = 'flex';
+            typeText.innerText = ""; // Reset teks
+            
+            let i = 0;
+            // Kecepatan mengetik
+            const speed = 40; 
+            
+            function typeWriter() {
+                if (i < fullText.length) {
+                    typeText.innerText += fullText.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, speed);
+                } else {
+                    // Jika selesai ngetik, tunggu 1.5 detik lalu masuk dashboard
+                    setTimeout(() => {
+                        introView.style.display = 'none';
+                        document.getElementById('dashboard-view').style.display = 'flex';
+                        resetTimer(); // Mulai timer auto-lock
+                    }, 1500);
                 }
             }
-            matrixInterval = setInterval(draw, 33);
+            typeWriter();
         }
-        startMatrix();
 
-        /* =========================================
-           3. LOGIC APLIKASI
-           ========================================= */
-        const loginView = document.getElementById('login-view');
-        const dashboard = document.getElementById('dashboard-view');
-        const viewer = document.getElementById('app-viewer');
-        const iframe = document.getElementById('web-frame');
-        const localTool = document.getElementById('local-tool');
+        // --- LOGIN LOGIC ---
         const passInput = document.getElementById('passInput');
-
-        // Login Enter Key
         passInput.addEventListener("keypress", function(e) { if(e.key === "Enter") verifyUser(); });
 
         function verifyUser() {
             const code = passInput.value;
             if (USERS_DB.hasOwnProperty(code)) {
-                document.getElementById('userNameDisplay').innerText = USERS_DB[code];
-                loginView.style.display = 'none';
-                dashboard.style.display = 'flex';
-                resetTimer(); // Mulai timer
+                const userName = USERS_DB[code];
+                document.getElementById('userNameDisplay').innerText = userName;
+                // Jalankan Animasi dulu, jangan langsung dashboard
+                playIntroAnimation(userName);
             } else {
-                document.getElementById('errorMsg').style.display = 'block';
-                setTimeout(() => document.getElementById('errorMsg').style.display = 'none', 1500);
+                const err = document.getElementById('errorMsg');
+                err.style.display = 'block';
+                setTimeout(() => err.style.display = 'none', 1500);
             }
         }
 
-        // BUKA APP -> GANTI KE MODE CLEAN
-        function openApp(type, url, title) {
-            // Ubah Body ke Mode Clean (Putih)
-            document.body.classList.add('mode-clean');
-            
-            // Stop Matrix (Hemat performa)
-            clearInterval(matrixInterval);
-            ctx.clearRect(0,0,canvas.width,canvas.height);
+        // --- AUTO LOCK 10 MENIT ---
+        let idleTime = 0;
+        setInterval(() => {
+            // Cek jika sedang tidak di login screen dan tidak di intro
+            if(document.getElementById('login-view').style.display === 'none' && document.getElementById('intro-view').style.display === 'none'){
+                idleTime++;
+                if(idleTime >= 10) lockSystem();
+            }
+        }, 60000); // Tiap 1 menit
+        
+        function resetTimer() { idleTime = 0; }
+        document.onmousemove = resetTimer; document.onkeypress = resetTimer; document.ontouchstart = resetTimer;
 
-            // Tampilkan Viewer
+        function lockSystem() {
+            closeApp(); // Tutup tool
+            document.getElementById('dashboard-view').style.display = 'none';
+            document.getElementById('intro-view').style.display = 'none';
+            document.getElementById('login-view').style.display = 'flex';
+            passInput.value = "";
+            alert("Sesi Berakhir (10 Menit). Terkunci.");
+        }
+
+        // --- NAVIGASI TOOLS ---
+        const dashboard = document.getElementById('dashboard-view');
+        const viewer = document.getElementById('app-viewer');
+        const iframe = document.getElementById('web-frame');
+        const localTool = document.getElementById('local-tool');
+
+        function openApp(type, url, title) {
+            document.body.classList.add('mode-clean'); // Ubah ke tema putih
+            clearInterval(matrixInterval); ctx.clearRect(0,0,canvas.width,canvas.height); // Stop Matrix
             dashboard.style.display = 'none';
             viewer.style.display = 'flex';
             document.getElementById('app-title-clean').innerText = title;
-            lucide.createIcons(); // Refresh icons
+            lucide.createIcons();
 
             if (type === 'web') {
-                iframe.style.display = 'block';
-                localTool.style.display = 'none';
-                iframe.src = url;
+                iframe.style.display = 'block'; localTool.style.display = 'none'; iframe.src = url;
             } else {
-                iframe.style.display = 'none';
-                localTool.style.display = 'flex';
+                iframe.style.display = 'none'; localTool.style.display = 'flex';
             }
         }
 
-        // TUTUP APP -> KEMBALI KE MODE HACKER
         function closeApp() {
-            // Hapus Mode Clean (Balik Hitam)
-            document.body.classList.remove('mode-clean');
-            
-            // Nyalakan Matrix lagi
-            startMatrix();
-
+            document.body.classList.remove('mode-clean'); // Ubah ke tema hitam
+            startMatrix(); // Mulai Matrix lagi
             viewer.style.display = 'none';
             dashboard.style.display = 'flex';
-            iframe.src = ""; // Reset iframe
-            clearAll(); // Reset tool
+            iframe.src = "";
+            clearAll();
         }
 
-        /* =========================================
-           4. FUNGSI PATH REMOVER
-           ========================================= */
+        // --- MATRIX EFFECT ---
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        let matrixInterval;
+        function startMatrix() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const fontSize = 16; const drops = Array(Math.floor(canvas.width/fontSize)).fill(1);
+            function draw() {
+                ctx.fillStyle = "rgba(0, 0, 0, 0.05)"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "#0F0"; ctx.font = fontSize + "px monospace";
+                for (let i = 0; i < drops.length; i++) {
+                    const text = "01MALESMIKIR".charAt(Math.floor(Math.random()*12));
+                    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+                    if (drops[i]*fontSize > canvas.height && Math.random()>0.975) drops[i]=0;
+                    drops[i]++;
+                }
+            }
+            matrixInterval = setInterval(draw, 40);
+        }
+        startMatrix();
+        window.addEventListener('resize', () => { 
+            if(!document.body.classList.contains('mode-clean')) { clearInterval(matrixInterval); startMatrix(); }
+        });
+
+        // --- PATH TOOL LOGIC ---
         function processPath() {
             const lines = document.getElementById('inputText').value.split('\n');
-            let result = "";
-            lines.forEach(line => {
-                let clean = line.trim().replace(/"/g, '');
-                if (clean) result += clean.split('\\').pop() + "\n";
+            let res = "";
+            lines.forEach(l => {
+                let cln = l.trim().replace(/"/g, '');
+                if(cln) res += cln.split('\\').pop() + "\n";
             });
-            document.getElementById('outputText').value = result;
+            document.getElementById('outputText').value = res;
         }
-
         function copyResult() {
-            const el = document.getElementById("outputText");
-            el.select(); document.execCommand("copy");
-            alert("Hasil Berhasil Disalin!");
+            document.getElementById("outputText").select(); document.execCommand("copy");
+            alert("Hasil Disalin!");
         }
-
         function clearAll() {
-            document.getElementById('inputText').value = "";
-            document.getElementById('outputText').value = "";
+            document.getElementById('inputText').value = ""; document.getElementById('outputText').value = "";
         }
     </script>
 </body>
