@@ -3,193 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SECURE SYSTEM V3.0</title>
+    <title>SECURE ACCESS | MULTI-USER</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
+        /* --- CONFIGURASI TEMA --- */
         :root {
-            /* HACKER THEME */
-            --hacker-green: #0f0;
-            --hacker-red: #ff003c;
-            --hacker-bg: #000;
-            
-            /* PRO THEME */
-            --pro-bg: #0f172a;
-            --pro-panel: #1e293b;
-            --pro-text: #f1f5f9;
-            --pro-accent: #6366f1;
-            --pro-border: #334155;
+            --hacker-green: #0f0; --hacker-red: #ff003c; --hacker-bg: #000;
+            --pro-bg: #0f172a; --pro-panel: #1e293b; --pro-text: #f1f5f9; --pro-accent: #6366f1; --pro-border: #334155;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--hacker-bg); color: var(--hacker-green); font-family: 'VT323', monospace; height: 100vh; overflow: hidden; transition: background-color 0.5s ease; }
 
-        body {
-            background-color: var(--hacker-bg);
-            color: var(--hacker-green);
-            font-family: 'VT323', monospace;
-            height: 100vh;
-            overflow: hidden;
-            transition: background-color 0.5s ease;
-        }
-
-        /* --- MODE TOGGLING CLASSES --- */
-        body.pro-mode {
-            background-color: var(--pro-bg);
-            color: var(--pro-text);
-            font-family: 'Inter', sans-serif;
-        }
+        /* MODE TOGGLE */
+        body.pro-mode { background-color: var(--pro-bg); color: var(--pro-text); font-family: 'Inter', sans-serif; }
         body.pro-mode .hacker-only { display: none !important; }
         body:not(.pro-mode) .pro-only { display: none !important; }
 
-        /* --- BACKGROUND EFFECTS --- */
+        /* BACKGROUND */
         canvas#matrix { position: fixed; top: 0; left: 0; z-index: 0; }
-        .scanlines {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%);
-            background-size: 100% 4px; pointer-events: none; z-index: 999;
-        }
+        .scanlines { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%); background-size: 100% 4px; pointer-events: none; z-index: 999; }
 
-        /* --- 0. LOGIN SCREEN (GERBANG UTAMA) --- */
-        #login-view {
-            height: 100%; display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            position: relative; z-index: 20;
-            background: rgba(0,0,0,0.8); /* Semi transparan biar matrix kelihatan */
-        }
-
-        .login-box {
-            border: 2px solid var(--hacker-green);
-            padding: 3rem; background: #000;
-            box-shadow: 0 0 30px var(--hacker-green);
-            text-align: center; width: 90%; max-width: 500px;
-        }
-
-        .login-title { font-size: 3rem; margin-bottom: 2rem; text-shadow: 0 0 10px var(--hacker-green); }
-
-        .input-group { position: relative; width: 100%; margin-bottom: 1.5rem; }
+        /* --- LOGIN SCREEN --- */
+        #login-view { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 20; background: rgba(0,0,0,0.9); }
+        .login-box { border: 2px solid var(--hacker-green); padding: 3rem; background: #000; box-shadow: 0 0 30px var(--hacker-green); text-align: center; width: 90%; max-width: 450px; }
+        .login-title { font-size: 2.5rem; margin-bottom: 2rem; text-shadow: 0 0 10px var(--hacker-green); }
         
-        .login-input {
-            width: 100%; background: transparent; border: none;
-            border-bottom: 2px solid #333; color: var(--hacker-green);
-            font-size: 2rem; font-family: 'VT323', monospace;
-            text-align: center; padding: 10px; outline: none; letter-spacing: 5px;
-        }
+        .input-group { position: relative; width: 100%; margin-bottom: 2rem; }
+        .login-input { width: 100%; background: transparent; border: none; border-bottom: 2px solid #333; color: var(--hacker-green); font-size: 2rem; font-family: 'VT323', monospace; text-align: center; padding: 10px; outline: none; letter-spacing: 3px; }
         .login-input:focus { border-color: var(--hacker-green); }
+        
+        .btn-login { background: var(--hacker-green); color: #000; border: none; padding: 10px 40px; font-size: 1.5rem; cursor: pointer; font-family: 'VT323', monospace; font-weight: bold; transition: 0.2s; width: 100%; }
+        .btn-login:hover { box-shadow: 0 0 20px var(--hacker-green); transform: scale(1.02); }
+        
+        #errorMsg { margin-top: 15px; color: var(--hacker-red); min-height: 1.5em; font-size: 1.2rem; display: none; }
 
-        .btn-login {
-            background: var(--hacker-green); color: #000; border: none;
-            padding: 10px 40px; font-size: 1.5rem; cursor: pointer;
-            font-family: 'VT323', monospace; font-weight: bold;
-            transition: 0.2s; margin-top: 1rem;
-        }
-        .btn-login:hover { box-shadow: 0 0 20px var(--hacker-green); transform: scale(1.05); }
-
-        /* Error Animation */
-        .access-denied { animation: shake 0.5s; border-color: var(--hacker-red) !important; box-shadow: 0 0 30px var(--hacker-red) !important; }
-        .access-denied .login-title { color: var(--hacker-red); text-shadow: 0 0 10px var(--hacker-red); }
-        .access-denied .btn-login { background: var(--hacker-red); }
-
-        @keyframes shake {
-            0% { transform: translateX(0); } 25% { transform: translateX(-10px); }
-            50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } 100% { transform: translateX(0); }
-        }
-
-        /* --- 1. DASHBOARD VIEW --- */
-        #dashboard-view {
-            display: none; /* Hidden by default */
-            height: 100%; overflow-y: auto; flex-direction: column;
-            align-items: center; justify-content: center; padding: 2rem;
-            position: relative; z-index: 10;
-        }
-
+        /* --- DASHBOARD STYLES --- */
+        #dashboard-view { display: none; height: 100%; overflow-y: auto; flex-direction: column; align-items: center; padding: 2rem; position: relative; z-index: 10; }
         .glitch-wrapper { text-align: center; margin-bottom: 4rem; }
-        .main-icon-wrapper {
-            display: inline-block; margin-bottom: 1rem; padding: 15px;
-            border: 3px solid var(--hacker-green); border-radius: 50%;
-            box-shadow: 0 0 25px var(--hacker-green); background: rgba(0, 20, 0, 0.8);
-        }
-        h1.clear-title {
-            font-family: 'Inter', sans-serif; font-size: 4rem; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 3px; color: var(--hacker-green);
-            text-shadow: 0 0 15px rgba(0, 255, 0, 0.6); margin: 0;
-        }
-        .system-status {
-            border: 1px solid var(--hacker-green); padding: 8px 25px;
-            font-size: 1.3rem; background: rgba(0,0,0,0.7);
-            box-shadow: 0 0 15px var(--hacker-green); margin-top: 20px; display: inline-block;
-        }
-
-        .grid-menu {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 2.5rem; width: 100%; max-width: 1200px;
-        }
-        .menu-card {
-            background: rgba(0, 20, 0, 0.85); border: 2px solid #004400;
-            padding: 2.5rem; cursor: pointer; transition: 0.3s;
-            position: relative; overflow: hidden; text-align: left;
-            box-shadow: 0 0 20px rgba(0, 255, 0, 0.1);
-        }
-        .menu-card:hover {
-            border-color: var(--hacker-green); box-shadow: 0 0 30px var(--hacker-green);
-            transform: translateY(-5px); background: #001100;
-        }
+        .main-icon-wrapper { display: inline-block; margin-bottom: 1rem; padding: 15px; border: 3px solid var(--hacker-green); border-radius: 50%; box-shadow: 0 0 25px var(--hacker-green); background: rgba(0, 20, 0, 0.8); }
+        h1.clear-title { font-family: 'Inter', sans-serif; font-size: 4rem; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; color: var(--hacker-green); text-shadow: 0 0 15px rgba(0, 255, 0, 0.6); margin: 0; }
+        
+        .system-status { border: 1px solid var(--hacker-green); padding: 8px 25px; font-size: 1.3rem; background: rgba(0,0,0,0.7); box-shadow: 0 0 15px var(--hacker-green); margin-top: 20px; display: inline-block; }
+        
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; width: 100%; max-width: 1200px; }
+        .menu-card { background: rgba(0, 20, 0, 0.85); border: 2px solid #004400; padding: 2.5rem; cursor: pointer; transition: 0.3s; position: relative; overflow: hidden; text-align: left; box-shadow: 0 0 20px rgba(0, 255, 0, 0.1); }
+        .menu-card:hover { border-color: var(--hacker-green); box-shadow: 0 0 30px var(--hacker-green); transform: translateY(-5px); background: #001100; }
         .menu-card h3 { font-size: 2.2rem; margin: 15px 0; color: #fff; }
         .menu-card p { font-size: 1.2rem; color: #00cc00; }
         .card-num { font-size: 3rem; opacity: 0.3; position: absolute; top: 10px; right: 20px; font-weight: bold; }
 
-        /* --- 2. APP VIEWER (PRO MODE) --- */
-        #app-viewer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--pro-bg); z-index: 100; display: none; flex-direction: column;
-        }
-
-        .top-bar {
-            height: 65px; background: var(--pro-panel); border-bottom: 1px solid var(--pro-border);
-            display: flex; align-items: center; justify-content: space-between; padding: 0 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .btn-back {
-            background: transparent; border: 1px solid var(--pro-border);
-            color: var(--pro-text); padding: 8px 16px; font-size: 0.95rem;
-            cursor: pointer; display: flex; align-items: center; gap: 8px;
-            transition: 0.2s; border-radius: 8px; font-weight: 600; font-family: 'Inter', sans-serif;
-        }
+        /* --- APP VIEWER --- */
+        #app-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--pro-bg); z-index: 100; display: none; flex-direction: column; }
+        .top-bar { height: 65px; background: var(--pro-panel); border-bottom: 1px solid var(--pro-border); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .btn-back { background: transparent; border: 1px solid var(--pro-border); color: var(--pro-text); padding: 8px 16px; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s; border-radius: 8px; font-weight: 600; font-family: 'Inter', sans-serif; }
         .btn-back:hover { background: var(--pro-border); }
-        #app-title { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.5px; }
         iframe { flex: 1; border: none; background: #fff; }
 
         /* --- TOOL UI --- */
-        #local-tool {
-            flex: 1; display: none; padding: 3rem;
-            background: var(--pro-bg); align-items: flex-start; justify-content: center;
-        }
+        #local-tool { flex: 1; display: none; padding: 3rem; background: var(--pro-bg); align-items: flex-start; justify-content: center; }
         .tool-layout { display: flex; gap: 2rem; height: 100%; width: 100%; max-width: 1200px; margin: 0 auto; }
-        .panel-box {
-            flex: 1; display: flex; flex-direction: column;
-            background: var(--pro-panel); border-radius: 12px;
-            border: 1px solid var(--pro-border); overflow: hidden;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        .panel-header {
-            background: rgba(255, 255, 255, 0.03); padding: 15px 20px; font-weight: 600;
-            border-bottom: 1px solid var(--pro-border); display: flex; align-items: center; gap: 10px;
-        }
-        textarea {
-            flex: 1; background: transparent; border: none; color: var(--pro-text);
-            font-size: 0.95rem; padding: 20px; resize: none; outline: none; font-family: 'Inter', sans-serif;
-        }
+        .panel-box { flex: 1; display: flex; flex-direction: column; background: var(--pro-panel); border-radius: 12px; border: 1px solid var(--pro-border); overflow: hidden; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .panel-header { background: rgba(255, 255, 255, 0.03); padding: 15px 20px; font-weight: 600; border-bottom: 1px solid var(--pro-border); display: flex; align-items: center; gap: 10px; }
+        textarea { flex: 1; background: transparent; border: none; color: var(--pro-text); font-size: 0.95rem; padding: 20px; resize: none; outline: none; font-family: 'Inter', sans-serif; }
         .controls-middle { display: flex; flex-direction: column; justify-content: center; gap: 1rem; }
-        .btn-process {
-            background: var(--pro-accent); color: white; border: none; width: 50px; height: 50px;
-            border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center;
-            transition: 0.2s;
-        }
+        .btn-process { background: var(--pro-accent); color: white; border: none; width: 50px; height: 50px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .btn-process:hover { transform: scale(1.05); }
-        .btn-copy {
-            background: transparent; border-top: 1px solid var(--pro-border); color: var(--pro-text);
-            padding: 12px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif;
-        }
+        .btn-copy { background: transparent; border-top: 1px solid var(--pro-border); color: var(--pro-text); padding: 12px; cursor: pointer; font-weight: 600; font-family: 'Inter', sans-serif; }
         .btn-copy:hover { background: rgba(255,255,255,0.05); color: var(--pro-accent); }
 
     </style>
@@ -203,10 +85,10 @@
         <div class="login-box" id="loginBox">
             <div class="login-title">SECURE LOGIN</div>
             <div class="input-group">
-                <input type="password" id="passInput" class="login-input" placeholder="ENTER ACCESS CODE" autocomplete="off">
+                <input type="password" id="passInput" class="login-input" placeholder="ENTER UNIQUE CODE" autocomplete="off">
             </div>
-            <button class="btn-login" onclick="checkLogin()">UNLOCK SYSTEM</button>
-            <div id="loginMsg" style="margin-top: 10px; min-height: 20px; color: var(--hacker-red);"></div>
+            <button class="btn-login" onclick="verifyUser()">AUTHENTICATE</button>
+            <div id="errorMsg">> ACCESS DENIED: INVALID KEY</div>
         </div>
     </div>
 
@@ -216,38 +98,29 @@
                 <i data-lucide="bot" size="70" color="#0f0"></i>
             </div>
             <h1 class="clear-title">MALES MIKIR_V3.0</h1>
-            <div class="system-status">● AUTHORIZED ACCESS: @BANGJEYY</div>
+            <div class="system-status">● WELCOME USER: <span id="userNameDisplay" style="color: #fff; font-weight:bold;">UNKNOWN</span></div>
         </div>
 
         <div class="grid-menu">
             <div class="menu-card" onclick="openApp('web', 'https://robot-rho-dusky.vercel.app/', 'Identifikasi Gambar')">
-                <div class="card-num">01</div>
-                <i data-lucide="scan-face" size="45" color="#0f0"></i>
-                <h3>IDENTIFIKASI GAMBAR</h3>
-                <p>> Execute Visual AI Protocol...</p>
+                <div class="card-num">01</div><i data-lucide="scan-face" size="45" color="#0f0"></i>
+                <h3>IDENTIFIKASI GAMBAR</h3><p>> Execute Visual AI Protocol...</p>
             </div>
             <div class="menu-card" onclick="openApp('web', 'https://robot-jee.vercel.app/', 'SEO Generator')">
-                <div class="card-num">02</div>
-                <i data-lucide="binary" size="45" color="#0f0"></i>
-                <h3>SEO GENERATOR</h3>
-                <p>> Inject Meta Keywords...</p>
+                <div class="card-num">02</div><i data-lucide="binary" size="45" color="#0f0"></i>
+                <h3>SEO GENERATOR</h3><p>> Inject Meta Keywords...</p>
             </div>
             <div class="menu-card" onclick="openApp('local', '', 'Remove Path Name')">
-                <div class="card-num">03</div>
-                <i data-lucide="file-code" size="45" color="#ff0055"></i>
-                <h3 style="color:#ff0055;">REMOVE PATH NAME</h3>
-                <p>> Extract Filename from String...</p>
+                <div class="card-num">03</div><i data-lucide="file-code" size="45" color="#ff0055"></i>
+                <h3 style="color:#ff0055;">REMOVE PATH NAME</h3><p>> Extract Filename from String...</p>
             </div>
         </div>
     </div>
 
     <div id="app-viewer">
         <div class="top-bar pro-only">
-            <button class="btn-back" onclick="closeApp()">
-                <i data-lucide="arrow-left"></i> Kembali ke Menu
-            </button>
-            <div id="app-title">Tools Name</div>
-            <div style="width: 100px;"></div>
+            <button class="btn-back" onclick="closeApp()"><i data-lucide="arrow-left"></i> Kembali ke Menu</button>
+            <div id="app-title" style="font-weight: 600;">Tools Name</div><div style="width: 100px;"></div>
         </div>
         <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
         
@@ -273,9 +146,21 @@
     <script>
         lucide.createIcons();
 
-        /* --- SETTING PASSWORD DI SINI --- */
-        const CORRECT_PASS = "Bangjeyy123"; 
-        /* Ganti "admin123" dengan password yang Anda mau */
+        /* ========================================================
+           [DATABASE PENGGUNA] - TAMBAHKAN SANDI MANUAL DI SINI
+           Format: "SANDI": "NAMA ORANGNYA",
+           ======================================================== */
+        
+        const USERS_DB = {
+            "admin_jey": "BANG JEY (ADMIN)",  // Sandi untuk Anda
+            "tamu01": "TEMAN A",              // Sandi untuk Teman A
+            "tamu02": "TEMAN B",              // Sandi untuk Teman B
+            "rahasia123": "VIP MEMBER",
+            // Tambahkan baris baru di bawah ini jika ada orang baru
+            "masukaja": "PENGUNJUNG BARU"     
+        };
+
+        /* ======================================================== */
 
         // Matrix Effect
         const canvas = document.getElementById('matrix');
@@ -303,69 +188,68 @@
             matrixInterval = setInterval(draw, 33);
         }
         startMatrix();
-        window.addEventListener('resize', () => { 
-            if(!document.body.classList.contains('pro-mode')) { clearInterval(matrixInterval); startMatrix(); }
-        });
 
         // --- LOGIN LOGIC ---
-        const loginView = document.getElementById('login-view');
-        const dashboard = document.getElementById('dashboard-view');
-        const loginBox = document.getElementById('loginBox');
         const passInput = document.getElementById('passInput');
+        const loginBox = document.getElementById('loginBox');
+        const errorMsg = document.getElementById('errorMsg');
 
-        // Bisa tekan ENTER untuk login
         passInput.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") checkLogin();
+            if (event.key === "Enter") verifyUser();
         });
 
-        function checkLogin() {
-            const val = passInput.value;
-            if(val === CORRECT_PASS) {
-                // SUKSES
-                loginBox.innerHTML = "<h2 style='color:#0f0; font-size:2rem;'>ACCESS GRANTED</h2><p>LOADING MODULES...</p>";
+        function verifyUser() {
+            const inputCode = passInput.value;
+            
+            // CEK APAKAH KODE ADA DI DATABASE USERS_DB
+            if (USERS_DB.hasOwnProperty(inputCode)) {
+                // JIKA BENAR
+                const userName = USERS_DB[inputCode]; // Ambil nama dari sandi
+                
+                // Animasi Sukses
+                loginBox.innerHTML = `<h2 style='color:#0f0; font-size:2rem;'>ACCESS GRANTED</h2><p style='color:white; margin-top:10px;'>WELCOME, ${userName}</p>`;
+                
+                // Update Nama di Dashboard
+                document.getElementById('userNameDisplay').innerText = userName;
+
                 setTimeout(() => {
-                    loginView.style.display = 'none';
-                    dashboard.style.display = 'flex';
+                    document.getElementById('login-view').style.display = 'none';
+                    document.getElementById('dashboard-view').style.display = 'flex';
                 }, 1500);
+
             } else {
-                // GAGAL
-                loginBox.classList.add('access-denied');
-                document.getElementById('loginMsg').innerText = "ACCESS DENIED: INCORRECT CODE";
+                // JIKA SALAH
+                errorMsg.style.display = 'block';
+                loginBox.style.borderColor = 'red';
                 passInput.value = "";
                 setTimeout(() => {
-                    loginBox.classList.remove('access-denied');
-                    document.getElementById('loginMsg').innerText = "";
-                }, 1000);
+                    errorMsg.style.display = 'none';
+                    loginBox.style.borderColor = '#0f0';
+                }, 1500);
             }
         }
 
-        // --- NAVIGATION & TOOLS ---
+        // --- NAVIGASI TOOLS ---
+        const dashboard = document.getElementById('dashboard-view');
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
         const titleLabel = document.getElementById('app-title');
 
         function openApp(type, url, title) {
-            document.body.classList.add('pro-mode'); // Ganti tema ke PRO
-            clearInterval(matrixInterval); ctx.clearRect(0,0,canvas.width,canvas.height); // Stop Matrix
-            
+            document.body.classList.add('pro-mode');
+            clearInterval(matrixInterval); ctx.clearRect(0,0,canvas.width,canvas.height);
             dashboard.style.display = 'none';
             viewer.style.display = 'flex';
             titleLabel.innerText = title;
             lucide.createIcons();
-
-            if (type === 'web') {
-                iframe.style.display = 'block'; localTool.style.display = 'none'; iframe.src = url;
-            } else {
-                iframe.style.display = 'none'; localTool.style.display = 'flex';
-                document.getElementById('inputText').focus();
-            }
+            if (type === 'web') { iframe.style.display = 'block'; localTool.style.display = 'none'; iframe.src = url; }
+            else { iframe.style.display = 'none'; localTool.style.display = 'flex'; }
         }
 
         function closeApp() {
-            document.body.classList.remove('pro-mode'); // Balik tema HACKER
-            startMatrix(); // Mulai Matrix
-            
+            document.body.classList.remove('pro-mode');
+            startMatrix();
             viewer.style.display = 'none';
             dashboard.style.display = 'flex';
             iframe.src = "";
@@ -385,7 +269,7 @@
         function copyResult() {
             const el = document.getElementById("outputText");
             el.select(); document.execCommand("copy");
-            alert("Hasil disalin!");
+            alert("Berhasil disalin!");
         }
 
         function clearAll() {
