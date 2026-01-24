@@ -20,15 +20,21 @@
 
         body {
             background-color: var(--bg);
-            background-image: 
-                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.15) 0%, transparent 20%),
-                radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.15) 0%, transparent 20%);
+            background-image: radial-gradient(circle at top, #1e1b4b, #0f172a);
             color: white;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden; /* Mencegah scroll di body utama */
+        }
+
+        /* --- CONTAINER UTAMA (DASHBOARD) --- */
+        #main-dashboard {
+            height: 100%;
+            overflow-y: auto; /* Scroll hanya di dalam dashboard */
             display: flex;
             flex-direction: column;
             align-items: center;
             padding-bottom: 3rem;
+            transition: transform 0.3s ease, opacity 0.3s ease;
         }
 
         header { padding: 3rem 1rem 2rem; text-align: center; }
@@ -42,162 +48,186 @@
         }
 
         .section-label {
-            width: 90%;
-            max-width: 1000px;
-            color: #64748b;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin: 2rem 0 1rem;
-            font-weight: 600;
-            border-bottom: 1px solid var(--border);
-            padding-bottom: 0.5rem;
+            width: 90%; max-width: 1000px; color: #64748b;
+            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px;
+            margin: 2rem 0 1rem; font-weight: 600;
+            border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;
         }
 
         .info-container {
-            width: 90%;
-            max-width: 1000px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1rem;
+            width: 90%; max-width: 1000px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;
         }
 
         .info-card {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid rgba(99, 102, 241, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .info-icon {
-            background: rgba(99, 102, 241, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            color: var(--primary);
+            background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px; padding: 1.5rem; display: flex; align-items: center; gap: 1rem;
         }
 
         .tools-container {
-            width: 90%;
-            max-width: 1000px;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
+            width: 90%; max-width: 1000px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;
         }
 
         .tool-card {
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            text-decoration: none;
-            color: white;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            min-height: 200px;
+            background: var(--glass); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 16px; padding: 2rem;
+            cursor: pointer; /* Ubah kursor jadi pointer */
+            color: white; transition: all 0.3s ease; position: relative; overflow: hidden;
+            display: flex; flex-direction: column; justify-content: space-between; min-height: 200px;
         }
 
-        .tool-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 4px;
-            background: var(--border);
-            transition: 0.3s;
-        }
-
-        .tool-card:hover {
-            transform: translateY(-5px);
-            background: var(--glass-hover);
-            box-shadow: 0 20px 40px -10px rgba(0,0,0,0.5);
-            border-color: rgba(255,255,255,0.2);
-        }
-
-        .tool-card:hover::before { background: var(--accent); }
-        .tool-card.danger:hover::before { background: var(--danger); }
-        .tool-card.danger .card-icon { color: var(--danger); }
-
+        .tool-card:hover { transform: translateY(-5px); background: var(--glass-hover); border-color: rgba(255,255,255,0.2); }
+        .tool-card .card-icon { margin-bottom: 1.5rem; color: var(--accent); }
         .card-content h3 { font-size: 1.4rem; margin-bottom: 0.5rem; }
         .card-content p { color: #94a3b8; font-size: 0.9rem; line-height: 1.5; }
-        .card-icon { margin-bottom: 1.5rem; color: var(--accent); }
 
-        .arrow {
-            align-self: flex-end;
-            opacity: 0;
-            transform: translateX(-10px);
-            transition: 0.3s;
-            color: #fff;
+        /* --- VIEWER LAYAR PENUH (IFRAME) --- */
+        #app-viewer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            z-index: 1000;
+            display: none; /* Tersembunyi secara default */
+            flex-direction: column;
         }
 
-        .tool-card:hover .arrow { opacity: 1; transform: translateX(0); }
+        #viewer-header {
+            height: 60px;
+            background: rgba(15, 23, 42, 0.95);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            justify-content: space-between;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid var(--border);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+
+        .back-btn:hover { background: var(--primary); border-color: var(--primary); }
+
+        iframe {
+            flex: 1;
+            width: 100%;
+            border: none;
+            background: #fff; /* Background putih agar website eksternal terlihat jelas */
+        }
 
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>MALES MIKIR</h1>
-        <p style="color: #94a3b8;">Dashboard Kontrol Terpusat</p>
-    </header>
+    <div id="main-dashboard">
+        <header>
+            <h1>MALES MIKIR</h1>
+            <p style="color: #94a3b8;">Dashboard Kontrol Terpusat</p>
+        </header>
 
-    <div class="section-label">System Status</div>
-    <div class="info-container">
-        <div class="info-card">
-            <div class="info-icon"><i data-lucide="cpu" size="24"></i></div>
-            <div>
-                <h4 style="color: #e2e8f0;">Core System</h4>
-                <div style="font-weight: bold; font-size: 1.1rem;">Robot AI Active</div>
+        <div class="section-label">System Status</div>
+        <div class="info-container">
+            <div class="info-card">
+                <i data-lucide="cpu" color="#6366f1"></i>
+                <div>
+                    <h4 style="color: #e2e8f0;">Core System</h4>
+                    <div style="font-weight: bold;">Robot AI Active</div>
+                </div>
+            </div>
+            <div class="info-card">
+                <i data-lucide="shield-check" color="#6366f1"></i>
+                <div>
+                    <h4 style="color: #e2e8f0;">Managed By</h4>
+                    <div style="font-weight: bold;">@Bangjeyy Tools</div>
+                </div>
             </div>
         </div>
-        <div class="info-card">
-            <div class="info-icon"><i data-lucide="shield-check" size="24"></i></div>
-            <div>
-                <h4 style="color: #e2e8f0;">Managed By</h4>
-                <div style="font-weight: bold; font-size: 1.1rem;">@Bangjeyy Tools</div>
+
+        <div class="section-label">Akses Layanan</div>
+        <div class="tools-container">
+            
+            <div class="tool-card" onclick="openApp('https://robot-rho-dusky.vercel.app/', 'Identifikasi Gambar')">
+                <div class="card-content">
+                    <i data-lucide="scan-eye" class="card-icon" size="36"></i>
+                    <h3>Identifikasi Gambar</h3>
+                    <p>Buka tool visual analisis tanpa meninggalkan dashboard.</p>
+                </div>
+                <i data-lucide="arrow-right" style="align-self: flex-end;"></i>
             </div>
+
+            <div class="tool-card" onclick="openApp('https://robot-jee.vercel.app/', 'SEO Generator')">
+                <div class="card-content">
+                    <i data-lucide="text-cursor-input" class="card-icon" size="36"></i>
+                    <h3>SEO Generator</h3>
+                    <p>Akses generator keyword dan meta description instan.</p>
+                </div>
+                <i data-lucide="arrow-right" style="align-self: flex-end;"></i>
+            </div>
+
+            <div class="tool-card" onclick="openApp('pathremove.html', 'Remove Video Path')">
+                <div class="card-content">
+                    <i data-lucide="eraser" class="card-icon" size="36" color="#f43f5e"></i>
+                    <h3>Remove Video Path</h3>
+                    <p>Buka tool pembersih lokal di layar ini.</p>
+                </div>
+                <i data-lucide="arrow-right" style="align-self: flex-end;"></i>
+            </div>
+
         </div>
+        
+        <footer style="margin-top: 3rem; color: #475569; font-size: 0.8rem;">
+            &copy; 2026 Males Mikir Dashboard.
+        </footer>
     </div>
 
-    <div class="section-label">Akses Layanan</div>
-    <div class="tools-container">
-        
-        <a href="https://robot-rho-dusky.vercel.app/" target="_blank" class="tool-card">
-            <div class="card-content">
-                <i data-lucide="scan-eye" class="card-icon" size="36"></i>
-                <h3>Identifikasi Gambar</h3>
-                <p>Analisis visual otomatis menggunakan link server Rho-Dusky.</p>
-            </div>
-            <i data-lucide="arrow-right" class="arrow"></i>
-        </a>
-
-        <a href="https://robot-jee.vercel.app/" target="_blank" class="tool-card">
-            <div class="card-content">
-                <i data-lucide="text-cursor-input" class="card-icon" size="36"></i>
-                <h3>SEO Generator</h3>
-                <p>Buat Title, Deskripsi, & Keyword otomatis via Robot-Jee.</p>
-            </div>
-            <i data-lucide="arrow-right" class="arrow"></i>
-        </a>
-
-        <a href="pathremove.html" target="_blank" class="tool-card danger">
-            <div class="card-content">
-                <i data-lucide="eraser" class="card-icon" size="36"></i>
-                <h3>Remove Video Path</h3>
-                <p>Akses tool lokal untuk pembersihan metadata video.</p>
-            </div>
-            <i data-lucide="arrow-right" class="arrow"></i>
-        </a>
-
+    <div id="app-viewer">
+        <div id="viewer-header">
+            <button class="back-btn" onclick="closeApp()">
+                <i data-lucide="arrow-left" size="18"></i> Kembali ke Dashboard
+            </button>
+            <span id="app-title" style="font-weight: bold; color: #e2e8f0;">Tool Name</span>
+            <div style="width: 100px;"></div> </div>
+        <iframe id="content-frame" src=""></iframe>
     </div>
 
     <script>
         lucide.createIcons();
+
+        // Fungsi untuk Membuka Tool
+        function openApp(url, title) {
+            // 1. Sembunyikan Dashboard
+            document.getElementById('main-dashboard').style.display = 'none';
+            
+            // 2. Munculkan Viewer
+            const viewer = document.getElementById('app-viewer');
+            viewer.style.display = 'flex';
+            
+            // 3. Set Judul dan URL Iframe
+            document.getElementById('app-title').innerText = title;
+            document.getElementById('content-frame').src = url;
+        }
+
+        // Fungsi untuk Menutup Tool (Kembali ke Dashboard)
+        function closeApp() {
+            // 1. Sembunyikan Viewer
+            document.getElementById('app-viewer').style.display = 'none';
+            
+            // 2. Kosongkan URL Iframe (Agar website reload/berhenti saat dibuka lagi)
+            document.getElementById('content-frame').src = '';
+            
+            // 3. Munculkan Dashboard Kembali
+            document.getElementById('main-dashboard').style.display = 'flex';
+        }
     </script>
 </body>
 </html>
