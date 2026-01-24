@@ -31,7 +31,6 @@
             padding-bottom: 3rem;
         }
 
-        /* HEADER */
         header { padding: 3rem 1rem 2rem; text-align: center; }
         h1 {
             font-size: 3rem;
@@ -42,7 +41,6 @@
             margin-bottom: 0.5rem;
         }
 
-        /* SECTION TITLES */
         .section-label {
             width: 90%;
             max-width: 1000px;
@@ -56,7 +54,6 @@
             padding-bottom: 0.5rem;
         }
 
-        /* INFO PANEL (STATIC) */
         .info-container {
             width: 90%;
             max-width: 1000px;
@@ -82,7 +79,6 @@
             color: var(--primary);
         }
 
-        /* TOOLS GRID (CLICKABLE) */
         .tools-container {
             width: 90%;
             max-width: 1000px;
@@ -124,18 +120,12 @@
         }
 
         .tool-card:hover::before { background: var(--accent); }
-        
-        /* Specific color for remove path */
         .tool-card.danger:hover::before { background: var(--danger); }
         .tool-card.danger .card-icon { color: var(--danger); }
 
         .card-content h3 { font-size: 1.4rem; margin-bottom: 0.5rem; }
         .card-content p { color: #94a3b8; font-size: 0.9rem; line-height: 1.5; }
-        
-        .card-icon {
-            margin-bottom: 1.5rem;
-            color: var(--accent);
-        }
+        .card-icon { margin-bottom: 1.5rem; color: var(--accent); }
 
         .arrow {
             align-self: flex-end;
@@ -145,10 +135,7 @@
             color: #fff;
         }
 
-        .tool-card:hover .arrow {
-            opacity: 1;
-            transform: translateX(0);
-        }
+        .tool-card:hover .arrow { opacity: 1; transform: translateX(0); }
 
     </style>
 </head>
@@ -168,7 +155,6 @@
                 <div style="font-weight: bold; font-size: 1.1rem;">Robot AI Active</div>
             </div>
         </div>
-
         <div class="info-card">
             <div class="info-icon"><i data-lucide="shield-check" size="24"></i></div>
             <div>
@@ -199,7 +185,7 @@
             <i data-lucide="arrow-right" class="arrow"></i>
         </a>
 
-        <a href="file:///C:/Users/DESAINER/Downloads/pathremove.html" target="_blank" class="tool-card danger">
+        <a href="pathremove.html" target="_blank" class="tool-card danger">
             <div class="card-content">
                 <i data-lucide="eraser" class="card-icon" size="36"></i>
                 <h3>Remove Video Path</h3>
