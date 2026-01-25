@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MALES MIKIR</title>
+    <title>MALES MIKIR | VIP ACCESS</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -325,17 +325,17 @@
             <div class="clean-container">
                 <div class="clean-card-tool">
                     <div class="clean-head"><i data-lucide="file-input"></i> Input Path</div>
-                    <textarea id="inputText" placeholder='Paste path panjang disini... Contoh: "C:\User\Data\File.jpg"'></textarea>
+                    <textarea id="inputText" placeholder='Paste path panjang disini... Contoh: "C:\User\Data\File.jpg"' oninput="resetTimer()"></textarea>
                     <div class="tool-actions">
-                        <button class="btn-tool btn-primary" onclick="processPath()"><i data-lucide="zap" size="16"></i> Proses</button>
-                        <button class="btn-tool btn-danger" onclick="clearAll()"><i data-lucide="trash-2" size="16"></i> Hapus</button>
+                        <button class="btn-tool btn-primary" onclick="processPath(); resetTimer();"><i data-lucide="zap" size="16"></i> Proses</button>
+                        <button class="btn-tool btn-danger" onclick="clearAll(); resetTimer();"><i data-lucide="trash-2" size="16"></i> Hapus</button>
                     </div>
                 </div>
                 <div class="clean-card-tool">
                     <div class="clean-head"><i data-lucide="file-output"></i> Hasil Output</div>
-                    <textarea id="outputText" readonly placeholder="Hasil nama file akan muncul disini..."></textarea>
+                    <textarea id="outputText" readonly placeholder="Hasil nama file akan muncul disini..." onclick="resetTimer()"></textarea>
                     <div class="tool-actions">
-                        <button class="btn-tool" style="background: #334155; color: white;" onclick="copyResult()"><i data-lucide="copy" size="16"></i> Salin Hasil</button>
+                        <button class="btn-tool" style="background: #334155; color: white;" onclick="copyResult(); resetTimer();"><i data-lucide="copy" size="16"></i> Salin Hasil</button>
                     </div>
                 </div>
             </div>
@@ -348,10 +348,10 @@
         // --- DATABASE PASSWORD (EDIT DISINI) ---
         const USERS_DB = {
             "bangje123": "ADMINISTRATOR",
-            "decmember12": "DEC MEMBER",
-            "Decteam12": "DEC TEAM",
+            "member12": "VIP MEMBER",
             "RODI123": "M RODI",
-            "WAHYU123": "WAHYU ARDIAN SYAFUTRA"
+            "WAHYU123": "WAHYU ARDIAN SYAFUTRA",
+            "Decteam12": "DEC TEAM"
         };
 
         // --- ANIMASI CINEMATIC INTRO ---
@@ -397,16 +397,30 @@
             }
         }
 
-        // --- AUTO LOCK (10 MENIT) ---
+        // --- AUTO LOCK YANG SUDAH DIPERBAIKI ---
         let idleTime = 0;
+        
+        // Reset timer ke 0 setiap kali ada aktivitas
+        function resetTimer() { 
+            idleTime = 0; 
+        }
+
+        // Timer berjalan setiap menit
         setInterval(() => {
+            // Hanya jalankan jika TIDAK sedang di halaman login
             if(document.getElementById('login-view').style.display === 'none'){
                 idleTime++;
+                // Jika sudah 10 menit (10x1 menit) tidak ada aktivitas
                 if(idleTime >= 10) lockSystem();
             }
-        }, 60000);
-        function resetTimer() { idleTime = 0; }
-        document.onclick = resetTimer; document.onkeypress = resetTimer; document.ontouchstart = resetTimer;
+        }, 60000); // 60000 ms = 1 menit
+
+        // Event Listener untuk mendeteksi aktivitas pengguna
+        document.onmousemove = resetTimer; // Gerakan mouse
+        document.onkeypress = resetTimer;  // Ketikan keyboard
+        document.ontouchstart = resetTimer; // Sentuhan layar (HP)
+        document.onclick = resetTimer;      // Klik mouse
+        document.onscroll = resetTimer;     // Scroll halaman
 
         function lockSystem() {
             closeApp();
@@ -414,7 +428,8 @@
             document.getElementById('intro-view').style.display = 'none';
             document.getElementById('login-view').style.display = 'flex';
             passInput.value = "";
-            alert("Sesi Habis. Terkunci Otomatis.");
+            // Menghapus alert agar tidak mengganggu, langsung kunci saja
+            // alert("Sesi Habis. Terkunci Otomatis."); 
         }
 
         // --- NAVIGATION & THEME SWITCHING ---
@@ -424,6 +439,7 @@
         const localTool = document.getElementById('local-tool');
 
         function openApp(type, url, title) {
+            resetTimer(); // Reset timer saat buka app
             document.body.classList.add('mode-clean');
             clearInterval(matrixInterval); ctx.clearRect(0,0,canvas.width,canvas.height);
             dashboard.style.display = 'none';
@@ -435,6 +451,7 @@
         }
 
         function closeApp() {
+            resetTimer(); // Reset timer saat tutup app
             document.body.classList.remove('mode-clean');
             startMatrix();
             viewer.style.display = 'none';
