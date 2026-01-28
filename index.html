@@ -35,7 +35,7 @@
             transition: all 0.5s ease;
         }
 
-        /* --- MODE CLEAN (SAAT TOOL DIBUKA) --- */
+        /* --- MODE CLEAN --- */
         body.mode-clean {
             background-color: var(--clean-bg);
             color: var(--clean-text);
@@ -148,9 +148,19 @@
         @keyframes blink-caret { 50% { border-color: transparent; } }
 
         /* MENU GRID */
-        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; width: 100%; max-width: 1000px; margin-bottom: 20px; }
-        .menu-card { background: rgba(20, 20, 20, 0.6); border: 1px solid #333; padding: 2rem; border-radius: 16px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; backdrop-filter: blur(5px); }
-        .menu-card:hover { border-color: var(--accent-color); background: rgba(0, 255, 0, 0.05); transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(0, 255, 0, 0.3); }
+        .grid-menu {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem; width: 100%; max-width: 1000px; margin-bottom: 20px;
+        }
+        .menu-card {
+            background: rgba(20, 20, 20, 0.6); border: 1px solid #333;
+            padding: 2rem; border-radius: 16px; cursor: pointer; transition: all 0.3s;
+            position: relative; overflow: hidden; backdrop-filter: blur(5px);
+        }
+        .menu-card:hover {
+            border-color: var(--accent-color); background: rgba(0, 255, 0, 0.05);
+            transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(0, 255, 0, 0.3);
+        }
         .menu-card h3 { font-family: 'Inter', sans-serif; font-weight: 700; margin: 15px 0 5px; color: #fff; }
         .menu-card p { font-family: 'VT323', monospace; color: #888; font-size: 1.1rem; }
         
@@ -161,12 +171,30 @@
         /* =========================================
            6. APP VIEWER (CLEAN THEME)
            ========================================= */
-        #app-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--clean-bg); z-index: 100; display: none; flex-direction: column; }
-        .top-bar-clean { height: 60px; background: var(--clean-surface); border-bottom: 1px solid var(--clean-border); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; flex-shrink: 0; }
-        .btn-back { display: flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--clean-border); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--clean-text); transition: 0.2s; }
+        #app-viewer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--clean-bg); z-index: 100;
+            display: none; flex-direction: column;
+        }
+        .top-bar-clean {
+            height: 60px; background: var(--clean-surface);
+            border-bottom: 1px solid var(--clean-border);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 1.5rem; flex-shrink: 0;
+        }
+        .btn-back {
+            display: flex; align-items: center; gap: 8px;
+            background: transparent; border: 1px solid var(--clean-border);
+            padding: 8px 14px; border-radius: 8px; cursor: pointer;
+            font-weight: 600; color: var(--clean-text); transition: 0.2s;
+        }
         .btn-back:hover { background: #f1f5f9; }
         
-        /* IZIN LENGKAP UNTUK COPY & DOWNLOAD */
+        /* TOMBOL GROQ KEY (Di dalam Viewer) */
+        .btn-groq { display: none; align-items: center; gap: 8px; background: #f97316; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.9rem; }
+        .btn-groq:hover { background: #ea580c; }
+
+        /* PERBAIKAN: IZIN LENGKAP UNTUK COPY & DOWNLOAD (WAJIB ADA allow=) */
         iframe { flex: 1; border: none; width: 100%; background: #fff; }
 
         #local-tool { flex: 1; display: none; padding: 1.5rem; overflow-y: auto; }
@@ -183,6 +211,7 @@
         @media (max-width: 768px) {
             .dash-title { font-size: 2.5rem; }
             .grid-menu { grid-template-columns: 1fr; }
+            .menu-card.full-width { grid-column: auto; }
             .intro-title { font-size: 1.8rem; }
             .intro-subtitle { font-size: 1.2rem; }
             .loading-line-wrapper { width: 150px; }
@@ -253,6 +282,11 @@
                 <h3 style="color: #f59e0b;">AMBIL API KEY GROQ</h3>
                 <p>Sebelum masuk ambil apikeynya disini.</p>
             </div>
+            <div class="menu-card" onclick="openApp('web', 'https://riset-cyan.vercel.app/', 'Riset Stock Market')">
+                <i data-lucide="trending-up" size="40" color="#0f0"></i>
+                <h3>RISET STOCK MARKET</h3>
+                <p>Khusus Riset Stock Asset di Microstock.</p>
+            </div>
         </div>
 
         <div class="dash-footer">
@@ -268,13 +302,18 @@
             <button class="btn-back" onclick="closeApp()">
                 <i data-lucide="arrow-left" size="18"></i> Menu Utama
             </button>
-            <div style="font-weight: 600;" id="app-title">Tool Name</div>
-            <div style="width: 50px;"></div>
+            <div style="display:flex; align-items:center; gap: 15px;">
+                <div style="font-weight: 600;" id="app-title">Tool Name</div>
+                <a href="https://console.groq.com/keys" target="_blank" class="btn-groq" id="groqKeyBtn">
+                    <i data-lucide="key" size="16"></i> 🔑 AMBIL API KEY
+                </a>
+            </div>
+            <div style="width: 20px;"></div>
         </div>
 
         <iframe id="web-frame" src="" 
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation"
-            allow="clipboard-read; clipboard-write">
+            allow="clipboard-read; clipboard-write; downloads">
         </iframe>
 
         <div id="local-tool" class="clean-element">
@@ -306,10 +345,10 @@
             "member12": "VIP MEMBER",
             "RODI123": "M RODI",
             "WAHYU123": "WAHYU ARDIAN SYAFUTRA",
+            "ROZI112": "Rozy Syaputra",
             "Iwan.12": "Mr. Iwandi",
             "Zulman.13": "Mr. Zulaman",
             "Ghopar.14": "Mr. Ghopar",
-            "ROZI112": "Rozy Syaputra",
             "Decteam12": "DEC TEAM"
         };
 
@@ -381,6 +420,7 @@
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
+        const groqBtn = document.getElementById('groqKeyBtn');
 
         function openApp(type, url, title) {
             resetTimer();
@@ -390,6 +430,12 @@
             viewer.style.display = 'flex';
             document.getElementById('app-title').innerText = title;
             lucide.createIcons();
+
+            if (title.toUpperCase().includes('SEO')) {
+                groqBtn.style.display = 'flex';
+            } else {
+                groqBtn.style.display = 'none';
+            }
 
             if (type === 'web') { 
                 iframe.style.display = 'block'; 
