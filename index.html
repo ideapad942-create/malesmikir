@@ -100,14 +100,9 @@
            5. DASHBOARD (HACKER THEME)
            ========================================= */
         #dashboard-view {
-            display: none; 
-            height: 100%; 
-            overflow-y: auto;
-            flex-direction: column; 
-            align-items: center; 
-            padding: 2rem 1rem;
-            position: relative; 
-            z-index: 10;
+            display: none; height: 100%; overflow-y: auto;
+            flex-direction: column; align-items: center; padding: 2rem 1rem;
+            position: relative; z-index: 10;
         }
 
         .dash-header { text-align: center; margin-bottom: 2.5rem; animation: fadeIn 1s ease; }
@@ -124,109 +119,66 @@
             text-shadow: 0 0 20px rgba(0,255,0,0.4); margin-bottom: 5px;
         }
 
-        /* --- FOOTER (License & Pesan) - FIXED BOTTOM LOGIC --- */
+        /* --- FOOTER --- */
         .dash-footer {
-            margin-top: auto; /* Ini kunci agar footer terdorong ke bawah */
-            text-align: center;
-            width: 100%;
-            padding-top: 4rem; /* Jarak aman dari menu */
-            padding-bottom: 2rem;
-            animation: fadeIn 2s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            margin-top: auto; text-align: center; width: 100%;
+            padding-top: 4rem; padding-bottom: 2rem; animation: fadeIn 2s ease;
+            display: flex; flex-direction: column; align-items: center;
         }
-
         .license-tag {
-            display: inline-block;
-            font-family: 'VT323', monospace; font-size: 1rem;
-            color: #0f0; border: 1px solid #0f0;
-            padding: 4px 15px; background: rgba(0,255,0,0.05);
-            box-shadow: 0 0 10px rgba(0,255,0,0.1); letter-spacing: 2px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
+            display: inline-block; font-family: 'VT323', monospace; font-size: 1rem;
+            color: #0f0; border: 1px solid #0f0; padding: 4px 15px;
+            background: rgba(0,255,0,0.05); box-shadow: 0 0 10px rgba(0,255,0,0.1);
+            letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase;
         }
-
         .marquee-message {
-            font-family: 'VT323', monospace; font-size: 1.1rem;
-            color: #888; text-shadow: 0 0 5px rgba(0, 255, 0, 0.2);
-            height: 25px; overflow: hidden; white-space: nowrap;
-            position: relative; max-width: 90vw; margin: 0 auto;
+            font-family: 'VT323', monospace; font-size: 1.1rem; color: #888;
+            text-shadow: 0 0 5px rgba(0, 255, 0, 0.2); height: 25px;
+            overflow: hidden; white-space: nowrap; position: relative; max-width: 90vw;
         }
-        
         .typewriter-text {
             display: inline-block; overflow: hidden;
-            border-right: 2px solid var(--accent-color);
-            white-space: nowrap;
+            border-right: 2px solid var(--accent-color); white-space: nowrap;
             animation: typing 6s steps(60, end) infinite, blink-caret .75s step-end infinite;
             max-width: 100%;
         }
-
         @keyframes typing { 0% { width: 0; } 50% { width: 100%; } 70% { width: 100%; } 100% { width: 0; } }
         @keyframes blink-caret { 50% { border-color: transparent; } }
 
         /* MENU GRID */
-        .grid-menu {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem; width: 100%; max-width: 1000px;
-            margin-bottom: 20px; /* Spacer bawah agar tidak mepet footer */
-        }
-        .menu-card {
-            background: rgba(20, 20, 20, 0.6); border: 1px solid #333;
-            padding: 2rem; border-radius: 16px; cursor: pointer; transition: all 0.3s;
-            position: relative; overflow: hidden; backdrop-filter: blur(5px);
-        }
-        .menu-card:hover {
-            border-color: var(--accent-color); background: rgba(0, 255, 0, 0.05);
-            transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(0, 255, 0, 0.3);
-        }
+        .grid-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; width: 100%; max-width: 1000px; margin-bottom: 20px; }
+        .menu-card { background: rgba(20, 20, 20, 0.6); border: 1px solid #333; padding: 2rem; border-radius: 16px; cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden; backdrop-filter: blur(5px); }
+        .menu-card:hover { border-color: var(--accent-color); background: rgba(0, 255, 0, 0.05); transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(0, 255, 0, 0.3); }
         .menu-card h3 { font-family: 'Inter', sans-serif; font-weight: 700; margin: 15px 0 5px; color: #fff; }
         .menu-card p { font-family: 'VT323', monospace; color: #888; font-size: 1.1rem; }
-
-        /* Style Khusus Menu Full Width (Tombol Paling Bawah Grid) */
-        .menu-card.full-width {
-            grid-column: 1 / -1; 
-            background: rgba(30, 30, 30, 0.7); 
-            border-color: rgba(99, 102, 241, 0.5); 
-        }
-        .menu-card.full-width:hover {
-            border-color: #6366f1;
-            background: rgba(99, 102, 241, 0.1);
-            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3);
-        }
+        .menu-card.full-width { grid-column: 1 / -1; background: rgba(30, 30, 30, 0.7); border-color: rgba(99, 102, 241, 0.5); }
+        .menu-card.full-width:hover { border-color: #6366f1; background: rgba(99, 102, 241, 0.1); box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.3); }
         .menu-card.full-width i { color: #6366f1; } 
 
         /* =========================================
            6. APP VIEWER (CLEAN THEME)
            ========================================= */
-        #app-viewer {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--clean-bg); z-index: 100;
-            display: none; flex-direction: column;
-        }
-        .top-bar-clean {
-            height: 60px; background: var(--clean-surface);
-            border-bottom: 1px solid var(--clean-border);
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 1.5rem; flex-shrink: 0;
-        }
-        .btn-back {
-            display: flex; align-items: center; gap: 8px;
-            background: transparent; border: 1px solid var(--clean-border);
-            padding: 8px 14px; border-radius: 8px; cursor: pointer;
-            font-weight: 600; color: var(--clean-text); transition: 0.2s;
-        }
+        #app-viewer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--clean-bg); z-index: 100; display: none; flex-direction: column; }
+        .top-bar-clean { height: 60px; background: var(--clean-surface); border-bottom: 1px solid var(--clean-border); display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; flex-shrink: 0; }
+        .btn-back { display: flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--clean-border); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--clean-text); transition: 0.2s; }
         .btn-back:hover { background: #f1f5f9; }
+        
+        /* TOMBOL GROQ KEY (BARU) */
+        .btn-groq {
+            display: none; /* Default sembunyi, muncul via JS */
+            align-items: center; gap: 8px; 
+            background: #f97316; color: white; border: none;
+            padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer;
+            text-decoration: none; font-size: 0.9rem;
+        }
+        .btn-groq:hover { background: #ea580c; }
+
+        /* PERBAIKAN: Tambahkan permissions lengkap */
         iframe { flex: 1; border: none; width: 100%; background: #fff; }
 
         #local-tool { flex: 1; display: none; padding: 1.5rem; overflow-y: auto; }
         .clean-container { width: 100%; max-width: 800px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
-        .clean-card-tool {
-            background: var(--clean-surface); border-radius: 12px;
-            border: 1px solid var(--clean-border); overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-        }
+        .clean-card-tool { background: var(--clean-surface); border-radius: 12px; border: 1px solid var(--clean-border); overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .clean-head { padding: 12px 20px; background: #f8fafc; border-bottom: 1px solid var(--clean-border); font-weight: 600; color: #475569; display: flex; align-items: center; gap: 8px; }
         textarea { width: 100%; border: none; padding: 20px; outline: none; font-family: 'Inter', sans-serif; resize: vertical; min-height: 150px; color: var(--clean-text); }
         .tool-actions { display: flex; gap: 10px; padding: 15px; background: #fff; border-top: 1px solid var(--clean-border); }
@@ -319,11 +271,17 @@
             <button class="btn-back" onclick="closeApp()">
                 <i data-lucide="arrow-left" size="18"></i> Menu Utama
             </button>
-            <div style="font-weight: 600;" id="app-title">Tool Name</div>
-            <div style="width: 50px;"></div>
+            <div style="display:flex; align-items:center; gap: 15px;">
+                <div style="font-weight: 600;" id="app-title">Tool Name</div>
+                
+                <a href="https://console.groq.com/keys" target="_blank" class="btn-groq" id="groqKeyBtn">
+                    <i data-lucide="key" size="16"></i> 🔑 AMBIL API KEY
+                </a>
+            </div>
+            <div style="width: 20px;"></div>
         </div>
 
-        <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads"></iframe>
+        <iframe id="web-frame" src="" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation"></iframe>
 
         <div id="local-tool" class="clean-element">
             <div class="clean-container">
@@ -425,6 +383,7 @@
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
+        const groqBtn = document.getElementById('groqKeyBtn');
 
         function openApp(type, url, title) {
             resetTimer();
@@ -434,8 +393,22 @@
             viewer.style.display = 'flex';
             document.getElementById('app-title').innerText = title;
             lucide.createIcons();
-            if (type === 'web') { iframe.style.display = 'block'; localTool.style.display = 'none'; iframe.src = url; }
-            else { iframe.style.display = 'none'; localTool.style.display = 'block'; }
+
+            // LOGIKA TOMBOL KHUSUS GROQ
+            if (title.toUpperCase().includes('SEO')) {
+                groqBtn.style.display = 'flex';
+            } else {
+                groqBtn.style.display = 'none';
+            }
+
+            if (type === 'web') { 
+                iframe.style.display = 'block'; 
+                localTool.style.display = 'none'; 
+                iframe.src = url; 
+            } else { 
+                iframe.style.display = 'none'; 
+                localTool.style.display = 'block'; 
+            }
         }
 
         function closeApp() {
