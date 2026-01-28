@@ -190,11 +190,7 @@
         }
         .btn-back:hover { background: #f1f5f9; }
         
-        /* TOMBOL GROQ KEY (Di dalam Viewer) */
-        .btn-groq { display: none; align-items: center; gap: 8px; background: #f97316; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.9rem; }
-        .btn-groq:hover { background: #ea580c; }
-
-        /* PERBAIKAN: IZIN LENGKAP UNTUK COPY & DOWNLOAD (WAJIB ADA allow=) */
+        /* FIX: Tambahkan 'allow-modals' agar notifikasi Hapus Semua berfungsi */
         iframe { flex: 1; border: none; width: 100%; background: #fff; }
 
         #local-tool { flex: 1; display: none; padding: 1.5rem; overflow-y: auto; }
@@ -211,7 +207,6 @@
         @media (max-width: 768px) {
             .dash-title { font-size: 2.5rem; }
             .grid-menu { grid-template-columns: 1fr; }
-            .menu-card.full-width { grid-column: auto; }
             .intro-title { font-size: 1.8rem; }
             .intro-subtitle { font-size: 1.2rem; }
             .loading-line-wrapper { width: 150px; }
@@ -302,17 +297,12 @@
             <button class="btn-back" onclick="closeApp()">
                 <i data-lucide="arrow-left" size="18"></i> Menu Utama
             </button>
-            <div style="display:flex; align-items:center; gap: 15px;">
-                <div style="font-weight: 600;" id="app-title">Tool Name</div>
-                <a href="https://console.groq.com/keys" target="_blank" class="btn-groq" id="groqKeyBtn">
-                    <i data-lucide="key" size="16"></i> AMBIL API KEY
-                </a>
-            </div>
-            <div style="width: 20px;"></div>
+            <div style="font-weight: 600;" id="app-title">Tool Name</div>
+            <div style="width: 50px;"></div>
         </div>
 
         <iframe id="web-frame" src="" 
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation"
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation allow-modals"
             allow="clipboard-read; clipboard-write; downloads">
         </iframe>
 
@@ -420,7 +410,6 @@
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
-        const groqBtn = document.getElementById('groqKeyBtn');
 
         function openApp(type, url, title) {
             resetTimer();
@@ -430,12 +419,6 @@
             viewer.style.display = 'flex';
             document.getElementById('app-title').innerText = title;
             lucide.createIcons();
-
-            if (title.toUpperCase().includes('SEO')) {
-                groqBtn.style.display = 'flex';
-            } else {
-                groqBtn.style.display = 'none';
-            }
 
             if (type === 'web') { 
                 iframe.style.display = 'block'; 
