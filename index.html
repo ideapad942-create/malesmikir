@@ -119,10 +119,12 @@
             text-shadow: 0 0 20px rgba(0,255,0,0.4); margin-bottom: 5px;
         }
 
-        /* --- FOOTER --- */
+        /* --- FOOTER (License & Pesan) - FIXED BOTTOM --- */
         .dash-footer {
-            margin-top: auto; text-align: center; width: 100%;
-            padding-top: 4rem; padding-bottom: 2rem; animation: fadeIn 2s ease;
+            margin-top: auto;
+            text-align: center; width: 100%;
+            padding-top: 4rem; padding-bottom: 2rem;
+            animation: fadeIn 2s ease;
             display: flex; flex-direction: column; align-items: center;
         }
         .license-tag {
@@ -164,11 +166,7 @@
         .btn-back { display: flex; align-items: center; gap: 8px; background: transparent; border: 1px solid var(--clean-border); padding: 8px 14px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--clean-text); transition: 0.2s; }
         .btn-back:hover { background: #f1f5f9; }
         
-        /* TOMBOL GROQ KEY (Di dalam Viewer) */
-        .btn-groq { display: none; align-items: center; gap: 8px; background: #f97316; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 0.9rem; }
-        .btn-groq:hover { background: #ea580c; }
-
-        /* PERBAIKAN: IZIN LENGKAP UNTUK COPY & DOWNLOAD */
+        /* IZIN LENGKAP UNTUK COPY & DOWNLOAD */
         iframe { flex: 1; border: none; width: 100%; background: #fff; }
 
         #local-tool { flex: 1; display: none; padding: 1.5rem; overflow-y: auto; }
@@ -270,13 +268,8 @@
             <button class="btn-back" onclick="closeApp()">
                 <i data-lucide="arrow-left" size="18"></i> Menu Utama
             </button>
-            <div style="display:flex; align-items:center; gap: 15px;">
-                <div style="font-weight: 600;" id="app-title">Tool Name</div>
-                <a href="https://console.groq.com/keys" target="_blank" class="btn-groq" id="groqKeyBtn">
-                    <i data-lucide="key" size="16"></i> 🔑 AMBIL API KEY
-                </a>
-            </div>
-            <div style="width: 20px;"></div>
+            <div style="font-weight: 600;" id="app-title">Tool Name</div>
+            <div style="width: 50px;"></div>
         </div>
 
         <iframe id="web-frame" src="" 
@@ -385,7 +378,6 @@
         const viewer = document.getElementById('app-viewer');
         const iframe = document.getElementById('web-frame');
         const localTool = document.getElementById('local-tool');
-        const groqBtn = document.getElementById('groqKeyBtn');
 
         function openApp(type, url, title) {
             resetTimer();
@@ -395,12 +387,6 @@
             viewer.style.display = 'flex';
             document.getElementById('app-title').innerText = title;
             lucide.createIcons();
-
-            if (title.toUpperCase().includes('SEO')) {
-                groqBtn.style.display = 'flex';
-            } else {
-                groqBtn.style.display = 'none';
-            }
 
             if (type === 'web') { 
                 iframe.style.display = 'block'; 
