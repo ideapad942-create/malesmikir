@@ -389,20 +389,38 @@
             }
         }
 
+        /* =========================================
+           LOGIC TIMEOUT / IDLE DETECTION
+           (Diperbaiki untuk HP/Mobile)
+           ========================================= */
         let idleTime = 0;
-        function resetTimer() { idleTime = 0; }
+        function resetTimer() { 
+            idleTime = 0; 
+        }
+
+        // Timer berjalan setiap 1 menit (60000ms)
         setInterval(() => {
+            // Hanya jalankan timer jika TIDAK sedang di halaman login
             if(document.getElementById('login-view').style.display === 'none'){
                 idleTime++;
-                if(idleTime >= 10) lockSystem();
+                if(idleTime >= 10) {
+                    lockSystem();
+                }
             }
         }, 60000);
 
-        document.onmousemove = resetTimer;
-        document.onkeypress = resetTimer;
-        document.ontouchstart = resetTimer;
-        document.onclick = resetTimer;
-        document.onscroll = resetTimer;
+        // LISTENER AKTIVITAS
+        // Menggunakan window.addEventListener agar lebih sensitif di HP
+        // 'touchmove' penting untuk mendeteksi scrolling di HP
+        // 'click' dan 'scroll' menangkap interaksi umum
+        const activityEvents = [
+            'mousemove', 'mousedown', 'click', 'scroll', 'keypress', 
+            'touchstart', 'touchmove', 'touchend'
+        ];
+
+        activityEvents.forEach(event => {
+            window.addEventListener(event, resetTimer, true); 
+        });
 
         function lockSystem() {
             closeApp();
