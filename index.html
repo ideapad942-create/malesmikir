@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MALES MIKIR | VIP ACCESS</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mqtt/5.5.2/mqtt.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
@@ -35,6 +36,7 @@
             transition: all 0.5s ease;
         }
 
+        /* --- MODE CLEAN --- */
         body.mode-clean {
             background-color: var(--clean-bg);
             color: var(--clean-text);
@@ -118,6 +120,7 @@
             text-shadow: 0 0 20px rgba(0,255,0,0.4); margin-bottom: 5px;
         }
 
+        /* --- FOOTER (License & Pesan) - FIXED BOTTOM --- */
         .dash-footer {
             margin-top: auto;
             text-align: center; width: 100%;
@@ -164,6 +167,7 @@
         .menu-card h3 { font-family: 'Inter', sans-serif; font-weight: 700; margin: 15px 0 5px; color: #fff; }
         .menu-card p { font-family: 'VT323', monospace; color: #888; font-size: 1.1rem; }
         
+        /* CARD KHUSUS API KEY (WARNA BEDA) */
         .menu-card.api-key { border-color: rgba(245, 158, 11, 0.5); }
         .menu-card.api-key:hover { border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.3); }
 
@@ -237,7 +241,7 @@
             <div class="input-wrapper">
                 <input type="password" id="passInput" class="login-input" placeholder="PASSWORD" autocomplete="off">
             </div>
-            <button id="btn-login-main" class="btn-login" onclick="verifyUser()">MASUK SISTEM</button>
+            <button class="btn-login" onclick="verifyUser()">MASUK SISTEM</button>
             <div id="errorMsg" style="color: #ff003c; margin-top: 15px; display: none; font-weight: bold; font-size:0.9rem;">ACCESS DENIED</div>
         </div>
     </div>
@@ -245,7 +249,7 @@
     <div id="dashboard-view" class="hacker-element">
 
         <button id="btn-maintenance" onclick="toggleMaintenance()" style="display: none; position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 8px 15px; border-radius: 8px; cursor: pointer; align-items: center; gap: 8px; font-family: 'VT323', monospace; font-size: 1.1rem; transition: 0.3s; z-index: 999;">
-            <i data-lucide="shield-check" size="18"></i> MAINTENANCE: OFF
+            <i data-lucide="shield-check" size="18"></i> MENGHUBUNGKAN...
         </button>
 
         <div class="dash-header">
@@ -351,37 +355,48 @@
             "Decteam12": "DEC TEAM"
         };
 
-        // DATABASE CLOUD GRATIS UNTUK MENYIMPAN STATUS LINTAS HP/LAPTOP
-        const CLOUD_DB_URL = "https://kvdb.io/malesmikir_bangje_777_xzy/maintenance";
+        // ========================================================
+        // SISTEM IOT (INTERNET OF THINGS) SERVER PUBLIK
+        // Ini yang membuat sinyal bisa tembus lintas HP & Browser
+        // ========================================================
+        const clientId = 'malesmikir_vip_' + Math.random().toString(16).substr(2, 8);
+        const mqttClient = mqtt.connect('wss://broker.emqx.io:8084/mqtt', { clientId: clientId });
+        const MAINT_TOPIC = "bangje_vip_maint_status_12345_final";
+        
+        let isMaintCloud = false;
         let currentUserCode = ""; 
 
-        // Fungsi Ambil Status dari Internet
-        async function fetchMaintenanceStatus() {
-            try {
-                let response = await fetch(CLOUD_DB_URL);
-                if(response.ok) {
-                    let text = await response.text();
-                    return text === "ON";
-                }
-                return false; // Bawaan jika belum ada = OFF
-            } catch(e) {
-                return false;
-            }
-        }
+        mqttClient.on('connect', () => {
+            // Subscribe ke saluran komunikasi rahasia
+            mqttClient.subscribe(MAINT_TOPIC);
+        });
 
-        // Fungsi Simpan Status ke Internet
-        async function updateMaintenanceStatus(isOn) {
-            try {
-                await fetch(CLOUD_DB_URL, {
-                    method: 'POST',
-                    body: isOn ? "ON" : "OFF"
-                });
-                return true;
-            } catch(e) {
-                alert("Koneksi gagal saat merubah status database!");
-                return false;
+        mqttClient.on('message', (topic, message) => {
+            if (topic === MAINT_TOPIC) {
+                const status = message.toString();
+                isMaintCloud = (status === "ON");
+                
+                // Jika yang masuk adalah admin, perbarui tombolnya secara real-time
+                const btnMain = document.getElementById('btn-maintenance');
+                if (currentUserCode === "bangje123" && btnMain) {
+                    if (isMaintCloud) {
+                        btnMain.innerHTML = `<i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON`;
+                        btnMain.style.color = "#ff0055";
+                        btnMain.style.borderColor = "#333";
+                    } else {
+                        btnMain.innerHTML = `<i data-lucide="shield-check" size="18"></i> MAINTENANCE: OFF`;
+                        btnMain.style.color = "#0f0";
+                        btnMain.style.borderColor = "#0f0";
+                    }
+                    lucide.createIcons();
+                }
+
+                // LOGIKA TENDANG INSTAN: Jika bukan admin & maintenance nyala, tendang detik ini juga
+                if (isMaintCloud && currentUserCode !== "" && currentUserCode !== "bangje123") {
+                    forceKickUser();
+                }
             }
-        }
+        });
 
         function runCinematicIntro(userName) {
             const loginView = document.getElementById('login-view');
@@ -391,27 +406,10 @@
             document.getElementById('intro-user-name').innerText = userName;
             document.getElementById('dash-user').innerText = userName;
 
-            // Tampilkan Tombol Admin (Jika Admin)
             const btnMain = document.getElementById('btn-maintenance');
             if(userName.includes("ADMINISTRATOR")) {
                 btnMain.style.display = 'flex';
-                btnMain.innerHTML = `<i data-lucide="loader" size="18" class="spin"></i> CHECKING...`;
-                btnMain.style.pointerEvents = "none";
-                
-                // Cek status real dari database untuk nampilin tombol awal
-                fetchMaintenanceStatus().then(isMaint => {
-                    if(isMaint) {
-                        btnMain.innerHTML = `<i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON`;
-                        btnMain.style.color = "#ff0055";
-                        btnMain.style.borderColor = "#333";
-                    } else {
-                        btnMain.innerHTML = `<i data-lucide="shield-check" size="18"></i> MAINTENANCE: OFF`;
-                        btnMain.style.color = "#0f0";
-                        btnMain.style.borderColor = "#0f0";
-                    }
-                    btnMain.style.pointerEvents = "auto";
-                    lucide.createIcons();
-                });
+                // Tombol akan otomatis diperbarui oleh mqttClient.on('message') di atas
             } else {
                 btnMain.style.display = 'none';
             }
@@ -447,25 +445,16 @@
             setTimeout(() => { err.style.display = 'none'; passInput.style.borderColor = '#333'; }, 2500);
         }
 
-        // VERIFIKASI LOGIN MELALUI DATABASE CLOUD
-        async function verifyUser() {
+        function verifyUser() {
             const code = passInput.value.trim();
-            if(!code) return;
-
-            const btnLogin = document.getElementById("btn-login-main");
-            const originalText = btnLogin.innerText;
-            btnLogin.innerText = "AUTHENTICATING...";
-            btnLogin.disabled = true;
 
             if (USERS_DB.hasOwnProperty(code)) {
                 if(code === "bangje123") {
                     currentUserCode = code;
                     runCinematicIntro(USERS_DB[code]);
                 } else {
-                    // Cek internet dulu untuk status maintenance
-                    let isMaint = await fetchMaintenanceStatus();
-                    
-                    if(isMaint) {
+                    // Mengecek status dari server IoT secara langsung
+                    if(isMaintCloud) {
                         showAccessDenied("SISTEM SEDANG MAINTENANCE. MOHON MENUNGGU.", "#f59e0b");
                     } else {
                         currentUserCode = code;
@@ -475,52 +464,28 @@
             } else {
                 showAccessDenied("ACCESS DENIED", "#ff003c");
             }
-            
-            btnLogin.innerText = originalText;
-            btnLogin.disabled = false;
         }
 
-        // SAKLAR ADMIN - MENYIMPAN KE CLOUD DATABASE
-        async function toggleMaintenance() {
-            const btn = document.getElementById("btn-maintenance");
-            btn.innerHTML = `<i data-lucide="loader" size="18" class="spin"></i> MEMPROSES...`;
-            btn.style.pointerEvents = "none";
-
-            let currentIsOn = await fetchMaintenanceStatus();
-            let newState = !currentIsOn; // Balikkan nilainya
-            
-            await updateMaintenanceStatus(newState);
-            
-            if(newState) {
-                btn.innerHTML = `<i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON`;
-                btn.style.color = "#ff0055";
-                btn.style.borderColor = "#333";
-                alert("Berhasil! Semua perangkat dan browser lain sekarang TERBLOKIR.");
-            } else {
-                btn.innerHTML = `<i data-lucide="shield-check" size="18"></i> MAINTENANCE: OFF`;
-                btn.style.color = "#0f0";
-                btn.style.borderColor = "#0f0";
-                alert("Berhasil! Semua user sekarang bisa masuk kembali.");
-            }
-            btn.style.pointerEvents = "auto";
+        // FUNGSI SAKLAR ON/OFF MENGGUNAKAN SINYAL INTERNET
+        function toggleMaintenance() {
+            const newState = isMaintCloud ? "OFF" : "ON";
+            const btnMain = document.getElementById('btn-maintenance');
+            btnMain.innerHTML = `<i data-lucide="loader" size="18" class="spin"></i> MEMPROSES...`;
             lucide.createIcons();
-        }
-
-        /* =========================================
-           SISTEM RADAR 10 DETIK: INSTANT KICK LINTAS DEVICE
-           ========================================= */
-        setInterval(async () => {
-            // Jika user sedang ada di dalam dashboard
-            if(document.getElementById('login-view').style.display === 'none'){
-                // Jika dia bukan admin
-                if(currentUserCode !== "" && currentUserCode !== "bangje123") {
-                    let isMaint = await fetchMaintenanceStatus();
-                    if(isMaint) {
-                        forceKickUser();
+            
+            // Mengirim sinyal ke satelit IoT secara Retained (tersimpan permanen)
+            mqttClient.publish(MAINT_TOPIC, newState, { retain: true }, (err) => {
+                if(err) {
+                    alert("Koneksi gagal! Pastikan ada jaringan internet.");
+                } else {
+                    if(newState === "ON") {
+                        alert("🔴 MODE MAINTENANCE DIAKTIFKAN!\nSemua perangkat HP/Browser user lain INSTAN terblokir saat ini juga.");
+                    } else {
+                        alert("🟢 MODE MAINTENANCE DIMATIKAN!\nSemua user sekarang bisa login kembali dengan normal.");
                     }
                 }
-            }
-        }, 10000); // Cek database internet setiap 10 detik
+            });
+        }
 
         function forceKickUser() {
             closeApp();
@@ -529,7 +494,7 @@
             document.getElementById('login-view').style.display = 'flex';
             passInput.value = "";
             currentUserCode = ""; 
-            showAccessDenied("SISTEM TIBA-TIBA MAINTENANCE.", "#f59e0b");
+            showAccessDenied("MOHON MAAF, SISTEM TIBA-TIBA MAINTENANCE.", "#f59e0b");
         }
 
         /* =========================================
