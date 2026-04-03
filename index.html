@@ -245,7 +245,11 @@
 
     <div id="dashboard-view" class="hacker-element">
         
-        <button id="btn-maintenance" onclick="toggleMaintenance()" style="display: none; position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); border: 1px solid #333; color: #ff0055; padding: 8px 15px; border-radius: 8px; cursor: pointer; align-items: center; gap: 8px; font-family: 'VT323', monospace; font-size: 1.1rem; transition: 0.3s; z-index: 999;">
+        <button onclick="lockSystem()" style="position: absolute; top: 20px; left: 20px; background: transparent; border: 1px solid #333; color: #888; padding: 8px 15px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: 'VT323', monospace; font-size: 1.1rem; transition: 0.3s; z-index: 999;" onmouseover="this.style.color='#fff'; this.style.borderColor='#fff'" onmouseout="this.style.color='#888'; this.style.borderColor='#333'">
+            <i data-lucide="log-out" size="18"></i> LOGOUT
+        </button>
+
+        <button id="btn-maintenance" onclick="toggleMaintenance()" style="display: none; position: absolute; top: 20px; right: 20px; background: rgba(0,0,0,0.5); border: 1px solid #333; padding: 8px 15px; border-radius: 8px; cursor: pointer; align-items: center; gap: 8px; font-family: 'VT323', monospace; font-size: 1.1rem; transition: 0.3s; z-index: 999;">
             <i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON
         </button>
         <div class="dash-header">
@@ -351,8 +355,8 @@
             "Decteam12": "DEC TEAM"
         };
 
-        // VARIABEL STATUS MAINTENANCE (Default menyala / ditutup untuk member biasa)
-        let isMaintenanceMode = true; 
+        // AMBIL STATUS MAINTENANCE DARI BROWSER LOCALSTORAGE (Biar tidak reset pas di-refresh)
+        let isMaintenanceMode = localStorage.getItem("malesMikir_maintenance") === "false" ? false : true; 
         let currentUserCode = ""; 
 
         function runCinematicIntro(userName) {
@@ -362,6 +366,23 @@
             
             document.getElementById('intro-user-name').innerText = userName;
             document.getElementById('dash-user').innerText = userName;
+
+            // CEK DAN TAMPILKAN TOMBOL ADMIN BERDASARKAN STATUS
+            const btnMain = document.getElementById('btn-maintenance');
+            if(userName.includes("ADMINISTRATOR")) {
+                btnMain.style.display = 'flex';
+                if(isMaintenanceMode) {
+                    btnMain.innerHTML = `<i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON`;
+                    btnMain.style.color = "#ff0055";
+                    btnMain.style.borderColor = "#333";
+                } else {
+                    btnMain.innerHTML = `<i data-lucide="shield-check" size="18"></i> MAINTENANCE: OFF`;
+                    btnMain.style.color = "#0f0";
+                    btnMain.style.borderColor = "#0f0";
+                }
+            } else {
+                btnMain.style.display = 'none';
+            }
 
             loginView.style.display = 'none';
             introView.style.display = 'flex';
@@ -376,6 +397,7 @@
                     introView.classList.remove('intro-active');
                     introView.style.opacity = '1';
                     dashView.style.display = 'flex';
+                    lucide.createIcons(); // render icon di dashboard
                     resetTimer();
                 }, 800);
             }, 3500);
@@ -394,7 +416,6 @@
                 if(code === "bangje123") {
                     currentUserCode = code;
                     runCinematicIntro(USERS_DB[code]);
-                    document.getElementById('btn-maintenance').style.display = 'flex'; // Munculkan tombol saklar
                 } 
                 // JIKA USER BIASA YANG MASUK
                 else {
@@ -409,7 +430,6 @@
                         // Izinkan login jika Maintenance Non-Aktif
                         currentUserCode = code;
                         runCinematicIntro(USERS_DB[code]);
-                        document.getElementById('btn-maintenance').style.display = 'none'; // Sembunyikan saklar
                     }
                 }
             } else {
@@ -421,9 +441,11 @@
             }
         }
 
-        // FUNGSI SAKLAR ON/OFF MAINTENANCE (HANYA BISA DIKLIK OLEH ADMIN)
+        // FUNGSI SAKLAR ON/OFF MAINTENANCE
         function toggleMaintenance() {
             isMaintenanceMode = !isMaintenanceMode; // Balikkan status
+            localStorage.setItem("malesMikir_maintenance", isMaintenanceMode); // SIMPAN KE BROWSER
+            
             const btn = document.getElementById("btn-maintenance");
             
             if(isMaintenanceMode) {
@@ -444,33 +466,21 @@
 
         /* =========================================
            LOGIC TIMEOUT / IDLE DETECTION
-           (Diperbaiki untuk HP/Mobile)
            ========================================= */
         let idleTime = 0;
         function resetTimer() { 
             idleTime = 0; 
         }
 
-        // Timer berjalan setiap 1 menit (60000ms)
         setInterval(() => {
-            // Hanya jalankan timer jika TIDAK sedang di halaman login
             if(document.getElementById('login-view').style.display === 'none'){
                 idleTime++;
-                if(idleTime >= 10) {
-                    lockSystem();
-                }
+                if(idleTime >= 10) lockSystem();
             }
         }, 60000);
 
-        // LISTENER AKTIVITAS
-        const activityEvents = [
-            'mousemove', 'mousedown', 'click', 'scroll', 'keypress', 
-            'touchstart', 'touchmove', 'touchend'
-        ];
-
-        activityEvents.forEach(event => {
-            window.addEventListener(event, resetTimer, true); 
-        });
+        const activityEvents = ['mousemove', 'mousedown', 'click', 'scroll', 'keypress', 'touchstart', 'touchmove', 'touchend'];
+        activityEvents.forEach(event => { window.addEventListener(event, resetTimer, true); });
 
         function lockSystem() {
             closeApp();
