@@ -8,9 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=VT323&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     
     <style>
-        /* =========================================
-           1. CORE VARIABLES & RESET
-           ========================================= */
         :root {
             --bg-color: #050505;
             --accent-color: #0f0; 
@@ -35,7 +32,6 @@
             transition: all 0.5s ease;
         }
 
-        /* --- MODE CLEAN --- */
         body.mode-clean {
             background-color: var(--clean-bg);
             color: var(--clean-text);
@@ -43,9 +39,6 @@
         body.mode-clean #matrix, body.mode-clean .scanlines, body.mode-clean .hacker-element { display: none !important; }
         body:not(.mode-clean) .clean-element { display: none !important; }
 
-        /* =========================================
-           2. BACKGROUND VISUALS
-           ========================================= */
         canvas#matrix { position: fixed; top: 0; left: 0; z-index: 0; opacity: 0.8; }
         .scanlines {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -53,9 +46,6 @@
             background-size: 100% 4px; pointer-events: none; z-index: 998;
         }
 
-        /* =========================================
-           3. CINEMATIC INTRO
-           ========================================= */
         #intro-view {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 9999; display: none;
@@ -74,9 +64,6 @@
         .loading-line { width: 0%; height: 100%; background: var(--accent-color); box-shadow: 0 0 10px var(--accent-color); transition: width 2s cubic-bezier(0.65, 0, 0.35, 1) 1s; }
         .intro-active .loading-line { width: 100%; }
 
-        /* =========================================
-           4. LOGIN SCREEN
-           ========================================= */
         #login-view {
             height: 100%; display: flex; flex-direction: column;
             align-items: center; justify-content: center;
@@ -96,9 +83,6 @@
         .btn-login { background: var(--accent-color); color: #000; border: none; padding: 15px; font-size: 1rem; cursor: pointer; border-radius: 50px; font-weight: 800; width: 100%; letter-spacing: 1px; transition: 0.3s; text-transform: uppercase; }
         .btn-login:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 255, 0, 0.3); }
 
-        /* =========================================
-           5. DASHBOARD (HACKER THEME)
-           ========================================= */
         #dashboard-view {
             display: none; height: 100%; overflow-y: auto;
             flex-direction: column; align-items: center; padding: 2rem 1rem;
@@ -119,7 +103,6 @@
             text-shadow: 0 0 20px rgba(0,255,0,0.4); margin-bottom: 5px;
         }
 
-        /* --- FOOTER (License & Pesan) - FIXED BOTTOM --- */
         .dash-footer {
             margin-top: auto;
             text-align: center; width: 100%;
@@ -147,7 +130,6 @@
         @keyframes typing { 0% { width: 0; } 50% { width: 100%; } 70% { width: 100%; } 100% { width: 0; } }
         @keyframes blink-caret { 50% { border-color: transparent; } }
 
-        /* MENU GRID */
         .grid-menu {
             display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 1.5rem; width: 100%; max-width: 1000px; margin-bottom: 20px;
@@ -164,13 +146,9 @@
         .menu-card h3 { font-family: 'Inter', sans-serif; font-weight: 700; margin: 15px 0 5px; color: #fff; }
         .menu-card p { font-family: 'VT323', monospace; color: #888; font-size: 1.1rem; }
         
-        /* CARD KHUSUS API KEY (WARNA BEDA) */
         .menu-card.api-key { border-color: rgba(245, 158, 11, 0.5); }
         .menu-card.api-key:hover { border-color: #f59e0b; background: rgba(245, 158, 11, 0.1); box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.3); }
 
-        /* =========================================
-           6. APP VIEWER (CLEAN THEME)
-           ========================================= */
         #app-viewer {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--clean-bg); z-index: 100;
@@ -352,6 +330,20 @@
             "Decteam12": "DEC TEAM"
         };
 
+        // FUNGSI KHUSUS MENGAMBIL STATUS MAINTENANCE (STRING EXPLICIT)
+        function getMaintState() {
+            let state = localStorage.getItem("MALES_MIKIR_STATE");
+            if (state !== "ON" && state !== "OFF") {
+                localStorage.setItem("MALES_MIKIR_STATE", "OFF");
+                return "OFF";
+            }
+            return state;
+        }
+
+        function setMaintState(state) {
+            localStorage.setItem("MALES_MIKIR_STATE", state);
+        }
+
         function runCinematicIntro(userName) {
             const loginView = document.getElementById('login-view');
             const introView = document.getElementById('intro-view');
@@ -364,9 +356,8 @@
             const btnMain = document.getElementById('btn-maintenance');
             if(userName.includes("ADMINISTRATOR")) {
                 btnMain.style.display = 'flex';
-                // Cek status dari memori browser
-                let isMaint = localStorage.getItem("malesMikir_maintenance") === "true";
-                if(isMaint) {
+                
+                if(getMaintState() === "ON") {
                     btnMain.innerHTML = `<i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON`;
                     btnMain.style.color = "#ff0055";
                     btnMain.style.borderColor = "#333";
@@ -411,17 +402,15 @@
         }
 
         function verifyUser() {
-            const code = passInput.value;
+            const code = passInput.value.trim();
 
             if (USERS_DB.hasOwnProperty(code)) {
                 if(code === "bangje123") {
-                    // Admin selalu bebas masuk
+                    // Admin selalu bisa masuk
                     runCinematicIntro(USERS_DB[code]);
                 } else {
-                    // Cek status maintenance saat klik login
-                    let isMaint = localStorage.getItem("malesMikir_maintenance") === "true";
-                    
-                    if(isMaint) {
+                    // Cek status saat klik MASUK
+                    if(getMaintState() === "ON") {
                         showAccessDenied("SISTEM SEDANG MAINTENANCE. MOHON MENUNGGU.", "#f59e0b");
                     } else {
                         runCinematicIntro(USERS_DB[code]);
@@ -432,20 +421,19 @@
             }
         }
 
-        // FUNGSI SAKLAR ON/OFF MAINTENANCE (HANYA UNTUK ADMIN)
+        // FUNGSI SAKLAR ON/OFF MAINTENANCE
         function toggleMaintenance() {
-            let currentStatus = localStorage.getItem("malesMikir_maintenance") === "true";
-            let newStatus = !currentStatus;
-            
-            // Simpan status ke memori browser
-            localStorage.setItem("malesMikir_maintenance", newStatus);
+            let currentState = getMaintState();
+            let newState = currentState === "ON" ? "OFF" : "ON";
+            setMaintState(newState);
             
             const btn = document.getElementById("btn-maintenance");
-            if(newStatus) {
+            
+            if(newState === "ON") {
                 btn.innerHTML = `<i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON`;
                 btn.style.color = "#ff0055";
                 btn.style.borderColor = "#333";
-                alert("Mode Maintenance ON. User lain akan diblokir saat login.");
+                alert("Mode Maintenance ON. User lain akan diblokir saat mencoba login.");
             } else {
                 btn.innerHTML = `<i data-lucide="shield-check" size="18"></i> MAINTENANCE: OFF`;
                 btn.style.color = "#0f0";
