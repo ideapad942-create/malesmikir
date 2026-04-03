@@ -352,15 +352,6 @@
             "Decteam12": "DEC TEAM"
         };
 
-        let currentUserCode = ""; 
-        
-        // Buat channel komunikasi instan antar tab
-        const maintenanceChannel = new BroadcastChannel('malesmikir_channel');
-
-        function getMaintenanceStatus() {
-            return localStorage.getItem("malesMikir_maintenance") === "true";
-        }
-
         function runCinematicIntro(userName) {
             const loginView = document.getElementById('login-view');
             const introView = document.getElementById('intro-view');
@@ -369,10 +360,13 @@
             document.getElementById('intro-user-name').innerText = userName;
             document.getElementById('dash-user').innerText = userName;
 
+            // CEK DAN TAMPILKAN TOMBOL ADMIN
             const btnMain = document.getElementById('btn-maintenance');
             if(userName.includes("ADMINISTRATOR")) {
                 btnMain.style.display = 'flex';
-                if(getMaintenanceStatus()) {
+                // Cek status dari memori browser
+                let isMaint = localStorage.getItem("malesMikir_maintenance") === "true";
+                if(isMaint) {
                     btnMain.innerHTML = `<i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON`;
                     btnMain.style.color = "#ff0055";
                     btnMain.style.borderColor = "#333";
@@ -421,13 +415,15 @@
 
             if (USERS_DB.hasOwnProperty(code)) {
                 if(code === "bangje123") {
-                    currentUserCode = code;
+                    // Admin selalu bebas masuk
                     runCinematicIntro(USERS_DB[code]);
                 } else {
-                    if(getMaintenanceStatus()) {
+                    // Cek status maintenance saat klik login
+                    let isMaint = localStorage.getItem("malesMikir_maintenance") === "true";
+                    
+                    if(isMaint) {
                         showAccessDenied("SISTEM SEDANG MAINTENANCE. MOHON MENUNGGU.", "#f59e0b");
                     } else {
-                        currentUserCode = code;
                         runCinematicIntro(USERS_DB[code]);
                     }
                 }
@@ -436,47 +432,32 @@
             }
         }
 
-        // FUNGSI SAKLAR ON/OFF MAINTENANCE INSTAN
+        // FUNGSI SAKLAR ON/OFF MAINTENANCE (HANYA UNTUK ADMIN)
         function toggleMaintenance() {
-            let newStatus = !getMaintenanceStatus();
+            let currentStatus = localStorage.getItem("malesMikir_maintenance") === "true";
+            let newStatus = !currentStatus;
+            
+            // Simpan status ke memori browser
             localStorage.setItem("malesMikir_maintenance", newStatus);
             
-            // Kirim sinyal ke tab/jendela lain
-            maintenanceChannel.postMessage({ type: 'MAINTENANCE_TOGGLE', status: newStatus });
-            
             const btn = document.getElementById("btn-maintenance");
-            
             if(newStatus) {
                 btn.innerHTML = `<i data-lucide="shield-alert" size="18"></i> MAINTENANCE: ON`;
                 btn.style.color = "#ff0055";
                 btn.style.borderColor = "#333";
+                alert("Mode Maintenance ON. User lain akan diblokir saat login.");
             } else {
                 btn.innerHTML = `<i data-lucide="shield-check" size="18"></i> MAINTENANCE: OFF`;
                 btn.style.color = "#0f0";
                 btn.style.borderColor = "#0f0";
+                alert("Mode Maintenance OFF. Semua user bisa masuk dengan normal.");
             }
             lucide.createIcons();
         }
 
-        // MENERIMA SINYAL INSTAN DARI TAB LAIN
-        maintenanceChannel.onmessage = function(e) {
-            if(e.data.type === 'MAINTENANCE_TOGGLE') {
-                if(e.data.status === true && currentUserCode !== "" && currentUserCode !== "bangje123") {
-                    forceKickUser();
-                }
-            }
-        };
-
-        function forceKickUser() {
-            closeApp();
-            document.getElementById('dashboard-view').style.display = 'none';
-            document.getElementById('intro-view').style.display = 'none';
-            document.getElementById('login-view').style.display = 'flex';
-            passInput.value = "";
-            currentUserCode = ""; 
-            showAccessDenied("SISTEM TIBA-TIBA MAINTENANCE.", "#f59e0b");
-        }
-
+        /* =========================================
+           LOGIC TIMEOUT / IDLE DETECTION
+           ========================================= */
         let idleTime = 0;
         function resetTimer() { idleTime = 0; }
 
@@ -496,7 +477,6 @@
             document.getElementById('intro-view').style.display = 'none';
             document.getElementById('login-view').style.display = 'flex';
             passInput.value = "";
-            currentUserCode = "";
         }
 
         const dashboard = document.getElementById('dashboard-view');
